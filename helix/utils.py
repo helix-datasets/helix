@@ -395,6 +395,8 @@ class WindowsChocolateyDependency(Dependency):
             ".",
         )
 
+        output = output.decode("utf-8")
+
         return "1 packages installed" in output and self.package in output
 
     def string(self):
