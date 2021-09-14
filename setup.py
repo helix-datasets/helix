@@ -8,8 +8,7 @@ with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name="helix",
-    version=helix.__version__,
+    name="helix", version=helix.__version__,
     author=helix.__author__,
     author_email="helix@ll.mit.edu",
     url="https://github.com/helix-datasets/helix",
