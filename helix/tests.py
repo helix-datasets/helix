@@ -203,6 +203,8 @@ class ConfigurationTests(unittest.TestCase):
         self.assertTrue(hasattr(test, "configured"))
         self.assertTrue(test.configured)
 
+        self.assertTrue(False)
+
     def test_required_configuration_parameter(self):
         class Test(utils.Configurable):
             options = {"test": {}}
