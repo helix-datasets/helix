@@ -2,8 +2,10 @@ os: linux
 dist: xenial
 language: python
 python: 3.8
-install: pip install .[testing,development]
+install:
+  - pip install .[testing,development]
 script:
+  - sudo $(which helix) dependencies install
   - helix test system -v 2
   - helix test unit -v 2
   - helix test integration -v 2
