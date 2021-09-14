@@ -390,15 +390,12 @@ class WindowsChocolateyDependency(Dependency):
                 "choco is not installed on this platform"
             )
 
-        try:
-            run(
-                "{} list -lai -e {}".format(choco, self.package),
-                ".",
-            )
-        except subprocess.CalledProcessError:
-            return False
+        output, _ = run(
+            "{} list -l -e {}".format(choco, self.package),
+            ".",
+        )
 
-        return True
+        return "1 packages installed" in output and self.package in output
 
     def string(self):
         return self.package
