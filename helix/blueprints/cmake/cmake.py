@@ -17,16 +17,8 @@ class CMakeBlueprint(blueprint.Blueprint, metaclass=abc.ABCMeta):
         import winreg
 
         dependencies = [
-            utils.ManualPATHDependency(
-                "cmake",
-                help="You can download and install the latest version of CMake from https://cmake.org/download. The CMake binary must then be added to the system or user PATH.",
-            ),
-            utils.ManualWindowsRegistryDependency(
-                "visualstudio",
-                help="You can download and install the latest version of Visual Studio from https://visualstudio.microsoft.com/downloads/.",
-                registry=winreg.HKEY_LOCAL_MACHINE,
-                key=r"SOFTWARE\Microsoft\VisualStudio",
-            ),
+            utils.WindowsChocolateyDependency("cmake"),
+            utils.WindowsChocolateyDependency("visualstudio2017buildtools"),
         ]
 
     CALLSITE_MAIN = "main"

@@ -18,12 +18,7 @@ class MPRESSTransform(transform.Transform):
     version = "1.0.0"
     description = "The MPRESS packer"
 
-    dependencies = [
-        utils.ManualPATHDependency(
-            "mpress",
-            help="You can download and install the latest version of MPRESS fro https://www.matcode.com/mpress.htm. The MPRESS binary must then be added to the system or user PATH.",
-        )
-    ]
+    dependencies = [utils.WindowsChocolateyDependency("mpress")]
 
     def transform(self, source, destination):
         """Apply MPRESS to the target binary."""

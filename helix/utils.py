@@ -337,6 +337,73 @@ class ManualWindowsRegistryDependency(ManualDependency):
         return True
 
 
+class WindowsChocolateyDependency(Dependency):
+    """A dependency that may be installed via the Chocolatey package manager.
+
+    Args:
+        package (str): The package name.
+
+    Note:
+        These sorts of dependencies require that the plaform under which this
+        Blueprint/Component/Transform is run includes Chocolatey and assume
+        that it is already installed (i.e., this will not work on Linux).
+
+    Note:
+        These dependencies require Administrator permissions to install
+        successfully.
+    """
+
+    def __init__(self, package):
+        if os.name != "nt":
+            raise exceptions.ConfigurationError(
+                "unsupported platform for this dependency type: {}".format(os.name)
+            )
+
+        self.package = package
+
+    def install(self, verbose=False):
+        """Install the package with Chocolatey."""
+
+        choco = find("choco")
+
+        if not choco:
+            raise exceptions.MissingDependency(
+                "Chocolatey is not installed on this platform"
+            )
+
+        run(
+            "{} install -y {}".format(choco, self.package),
+            ".",
+            exceptions.DependencyInstallationFailure(
+                "failed to install {}".format(self.package)
+            ),
+            propagate=verbose,
+        )
+
+    def installed(self):
+        """Check if the package is installed with Chocolately."""
+
+        choco = find("choco")
+
+        if not choco:
+            raise exceptions.MissingDependency(
+                "choco is not installed on this platform"
+            )
+
+        try:
+            run(
+                "{} list -lai -e {}".format(choco, self.package),
+                ".",
+            )
+        except subprocess.CalledProcessError:
+            return False
+
+        return True
+
+    def string(self):
+        return self.package
+
+
 class LinuxAPTDependency(Dependency):
     """A dependency that may be installed via the Advanced Package Tool (APT).
 
