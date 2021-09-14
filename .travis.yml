@@ -13,6 +13,7 @@ script:
 jobs:
   include:
     - stage: lint
+      before_script: skip
       script: black --check ./ && flake8 ./
 
     - stage: test
