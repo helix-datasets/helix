@@ -4,8 +4,9 @@ language: python
 python: 3.8
 install:
   - pip install .[testing,development]
+before_script:
+  - sudo $(which helix) dependencies all
 script:
-  - helix dependencies all
   - helix test system -v 2
   - helix test unit -v 2
   - helix test integration -v 2
@@ -29,6 +30,8 @@ jobs:
       before_install:
         - choco install python --version 3.8.0
         - python -m pip install --upgrade pip
+      before_script:
+        - helix dependencies all
       env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
     - stage: deploy
