@@ -10,7 +10,7 @@ script:
 jobs:
   include:
     - stage: lint
-      script: black ./ && flake8 ./
+      script: black --check ./ && flake8 ./
 
     - stage: test
       name: "Python 3.6 on Linux"
