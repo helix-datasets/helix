@@ -1,0 +1,27 @@
+name: Feature Request
+description: Suggest a feature for the HELIX Framework
+labels: [enhancement, unverified]
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      placeholder: |
+        Alternative solutions or features you've considered.
+    validations:
+      required: true

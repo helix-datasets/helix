@@ -1,0 +1,5 @@
+SPDXVersion: SPDX-2.1
+PackageName: HELIX
+PackageOriginator: MIT Lincoln Laboratory
+PackageHomePage: https://github.com/helix-datasets/helix
+PackageLicenseDeclared: MIT

@@ -1,0 +1,28 @@
+{
+    "name": "example",
+    "blueprint": {"name": "cmake-cpp"},
+    "components": [
+        {
+            "name": "minimal-example",
+            "configuration": {}
+        },
+        {
+            "name": "configuration-example",
+            "configuration": {
+                "second_word": "example"
+            }
+        }
+    ],
+    "transforms": [
+        {
+            "name": "replace-example",
+            "configuration": {
+                "old": "hello",
+                "new": "goodbye"
+            }
+        },
+        {
+            "name": "strip"
+        }
+    ]
+}

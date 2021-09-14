@@ -1,0 +1,7 @@
+recursive-include helix *.c
+recursive-include helix *.cpp
+recursive-include helix *.cxx
+recursive-include helix *.h
+recursive-include helix *.hpp
+recursive-include helix *.hxx
+recursive-include helix CMakeLists*.txt
