@@ -99,6 +99,8 @@ class Command(management_utils.CommandBase):
             else:
                 classes = sorted(classes, key=lambda c: c.name)
 
+            failed = False
+
             for c in classes:
                 print(c.string())
 
@@ -130,6 +132,9 @@ class Command(management_utils.CommandBase):
                                     "\n".join(help), management_utils.COLOR_YELLOW
                                 )
                             )
+
+                        failed = True
+
                         continue
 
                     print(
@@ -139,3 +144,6 @@ class Command(management_utils.CommandBase):
                     )
                 else:
                     print("  no dependencies found")
+
+        if failed:
+            exit(1)

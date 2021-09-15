@@ -1,0 +1,53 @@
+os: linux
+dist: xenial
+language: python
+python: 3.8
+install:
+  - pip install .[testing,development]
+before_script:
+  - sudo $(which helix) dependencies all
+script:
+  - helix test system -v 2
+  - helix test unit -v 2
+  - helix test integration -v 2
+jobs:
+  include:
+    - stage: lint
+      before_script: skip
+      script: black --check ./ && flake8 ./
+
+    - stage: test
+      name: "Python 3.6 on Linux"
+      python: 3.6
+    - name: "Python 3.7 on Linux"
+      python: 3.7
+    - name: "Python 3.8 on Linux"
+      python: 3.8
+    - name: "Python 3.9 on Linux"
+      python: 3.9
+    - name: "Python 3.8 on Windows"
+      os: windows
+      language: shell
+      before_install:
+        - choco install python --version 3.8.0
+        - python -m pip install --upgrade pip
+      before_script:
+        - helix dependencies all
+      env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
+
+    - stage: deploy
+      script: python setup.py sdist
+      deploy:
+      - provider: pypi
+        username: "__token__"
+        password:
+          secure: "KJg86KICUzoTy7yLjiOZQcOgMGZwkimKOvXct9dktEaDx3mOotthhp5i79l93XfM3mmx1o9HiXcB6jgaCu7VpEmy3BNZIEKHKqZUG/i5aIK1j8ImWKoDJ21+lkaA/VvjwFZ28wriVbEUeO/baiAOu+chglITWLWRGvPwQ6VVGi5bRUXKDYgnK++iGAKYGXbU952aoPSe0zmOAWq0DZxDJVukQroQtMRf3c4SAaFHQjQgNVXyZpU6tCgH24ux0LK/fDkTLk9FSGxKDpH7LZ8cZiqEn3YMrwWBWZCzBnOcOAtkdrMSy6pK2er3kw1DkzegsUhuci4OQ43/EEAeV4y43KY8Lmy8nlKChx1HzDLXpEYbCO+b2RNLpZccZLee+XLdAp2l0UEM9uM2zI8FwO/RJFq5BefYfFh7fdrZFA31MrtQFJXL+neg1CcHbhPYRAvSHljMPVqi2q2KypbEQKo+nLS3/yiLjR84SqRtPIP51bPlxQDXyRxabtG6QxDDOui7Zi12k5//HdU9+C8Q7bKQl/LL2FC0XquHwH80kCJhDfZaVXk6RCT3L7kXbASprJfqUG1sB/GPuWoLOHqSHUHCuBREZi6tcmsKQsaALQfW/px1wTwUXkgAaJgWo4HIx19TkWTqt8KAY3n8qg6WWKRJyuJESEMKE9oPsn4nHWtXHbw="
+        skip_existing: true
+        on:
+          tags: true
+stages:
+    - lint
+    - name: test
+      if: (type = push AND branch = main) OR (type = pull_request)
+    - name: deploy
+      if: (type = push AND branch = main)

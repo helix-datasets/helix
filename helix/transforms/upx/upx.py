@@ -20,12 +20,7 @@ class UPXTransform(transform.Transform):
     if os.name == "posix":
         dependencies = [utils.LinuxAPTDependency("upx-ucl")]
     elif os.name == "nt":
-        dependencies = [
-            utils.ManualPATHDependency(
-                "upx",
-                help="You can download and install the latest version of UPX from https://upx.github.io/. The UPX binary must then be added to the system or user PATH.",
-            )
-        ]
+        dependencies = [utils.WindowsChocolateyDependency("upx")]
 
     def supported(self, source):
         """Check if UPX supports the given file.

@@ -116,4 +116,7 @@ class Command(management_utils.CommandBase):
                 output=options["output"], verbosity=options["verbosity"]
             )
 
-        runner.run(testsuite)
+        result = runner.run(testsuite)
+
+        if not result.wasSuccessful():
+            exit(1)
