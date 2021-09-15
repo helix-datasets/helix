@@ -18,7 +18,7 @@ class CMakeBlueprint(blueprint.Blueprint, metaclass=abc.ABCMeta):
 
         dependencies = [
             utils.WindowsChocolateyDependency("cmake"),
-            utils.WindowsChocolateyDependency("visualstudio2017buildtools"),
+            utils.WindowsChocolateyDependency("visualstudio2017-workload-vctools"),
         ]
 
     CALLSITE_MAIN = "main"
