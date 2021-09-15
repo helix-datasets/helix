@@ -1,5 +1,6 @@
 import os
 import abc
+import ctypes
 import shutil
 import tempfile
 import unittest
@@ -315,6 +316,41 @@ class DependencyTests(unittest.TestCase):
             ]
 
         self.assertTrue(Test.installed())
+
+    @unittest.skipUnless(os.name == "nt", "test not supported on this platform")
+    def test_windows_chocolatey_dependency_installed(self):
+        class Test(utils.Dependable):
+            dependencies = [utils.WindowsChocolateyDependency("chocolatey")]
+
+        self.assertTrue(Test.installed())
+
+    @unittest.skipUnless(os.name == "nt", "test not supported on this platform")
+    def test_windows_chocolatey_dependency_invalid(self):
+        class Test(utils.Dependable):
+            dependencies = [utils.WindowsChocolateyDependency("not-a-valid-package")]
+
+        self.assertFalse(Test.installed())
+
+    @unittest.skipUnless(
+        os.name == "nt" and ctypes.windll.shell32.IsUserAnAdmin(),
+        "test only supported on Windows and when running as an Admin",
+    )
+    def test_windows_chocolatey_dependency_install(self):
+        class Test(utils.Dependable):
+            dependencies = [utils.WindowsChocolateyDependency("chocolatey")]
+
+        Test.install()
+
+    @unittest.skipUnless(
+        os.name == "nt" and ctypes.windll.shell32.IsUserAnAdmin(),
+        "test only supported on Windows and when running as an Admin",
+    )
+    def test_windows_chocolatey_dependency_install_invalid(self):
+        class Test(utils.Dependable):
+            dependencies = [utils.WindowsChocolateyDependency("not-a-valid-package")]
+
+        with self.assertRaises(exceptions.DependencyInstallationFailure):
+            Test.install()
 
     @unittest.skipUnless(os.name == "posix", "test not supported on this platform")
     def test_linux_apt_dependency_installed(self):
