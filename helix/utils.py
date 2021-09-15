@@ -387,7 +387,7 @@ class WindowsChocolateyDependency(Dependency):
 
         if not choco:
             raise exceptions.MissingDependency(
-                "choco is not installed on this platform"
+                "Chocolatey is not installed on this platform"
             )
 
         output, _ = run(
