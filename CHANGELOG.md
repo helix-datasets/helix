@@ -9,10 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Travis CI testing and deployment
 - `WindowsChocolateyDependency` for automatically installing dependencies from
   the Chocolatey package manager
+- Additional information, filtering, and search to the `list` command
 
 ### Changed
 - Renamed the `dependencies` command to `install` - changed the CLI slightly
   and added a few quality of life features
+
+### Fixed
+- Terminal colors are no longer used when they are not supported by `stdout`
 
 ## [1.1.1] - 2021-09-14
 ### Added

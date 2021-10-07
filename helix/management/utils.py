@@ -6,6 +6,7 @@ https://docs.djangoproject.com/en/1.11/howto/custom-management-commands/
 """
 
 import abc
+import sys
 import pkgutil
 
 from . import exceptions
@@ -42,17 +43,23 @@ COLOR_END = "\033[0m"
 def color(message, color=None):
     """Format a message with terminal colors.
 
+    This is intelligent enough to not apply color formatting when the output
+    file descriptor would not support it.
+
     Args:
         message (str): A string message to format.
         color (str): The color to print - select from COLOR_* constants in this
             module. If this is not provided, this function does nothing.
 
     Returns:
-        A formatted message in the given color. You can pass this directoy to
+        A formatted message in the given color. You can pass this directly to
         ``print``.
     """
 
     if color is None:
+        return message
+
+    if not sys.stdout.isatty():
         return message
 
     return "{}{}{}".format(color, message, COLOR_END)
