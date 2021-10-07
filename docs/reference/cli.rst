@@ -1,7 +1,7 @@
 CLI Commands
 ------------
 
-.. autoclass:: helix.management.commands.dependencies.Command
+.. autoclass:: helix.management.commands.install.Command
     :no-members:
 .. autoclass:: helix.management.commands.list.Command
     :no-members:
