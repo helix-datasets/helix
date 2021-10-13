@@ -26,7 +26,7 @@ Additional Dependencies
 Some HELIX Blueprints, Components, and Transforms include additional, external
 dependencies which must be installed before they can be used in HELIX builds.
 To install all of these dependencies, use the ``install`` HELIX CLI command
-after installing HELIX:
+after installing HELIX with ``pip``:
 
 .. code-block:: bash
 
