@@ -3,10 +3,10 @@ import textwrap
 from ... import utils
 from ... import exceptions
 
-from .. import utils as management_utils
+from .. import utils as mutils
 
 
-class Command(management_utils.CommandBase):
+class Command(mutils.CommandBase):
     """Install external dependencies.
 
     .. code-block:: none
@@ -105,7 +105,7 @@ class Command(management_utils.CommandBase):
                 else:
                     classes = utils.load("helix.{}".format(part))
             except exceptions.EntrypointNotFound as e:
-                print(management_utils.color(e, management_utils.COLOR_RED))
+                mutils.print(e, color=mutils.Color.red)
                 exit(1)
 
             classes = sorted(classes, key=lambda c: c.name)
@@ -113,24 +113,16 @@ class Command(management_utils.CommandBase):
             failed = False
 
             for c in classes:
-                print(management_utils.color(c.string(), management_utils.COLOR_BOLD))
+                mutils.print(c.string(), style=mutils.Style.bold)
 
                 if c.dependencies:
                     if c.installed():
-                        print(
-                            management_utils.color(
-                                "  already installed", management_utils.COLOR_GREEN
-                            )
-                        )
+                        mutils.print("  already installed", color=mutils.Color.green)
 
                         continue
 
                     if options.get("check"):
-                        print(
-                            management_utils.color(
-                                "  not installed", management_utils.COLOR_YELLOW
-                            )
-                        )
+                        mutils.print("  not installed", color=mutils.Color.yellow)
 
                         failed = True
                         if fast:
@@ -147,21 +139,13 @@ class Command(management_utils.CommandBase):
                         if verbose:
                             print("-" * 80)
 
-                        print(
-                            management_utils.color(
-                                "  {}".format(e), management_utils.COLOR_RED
-                            )
-                        )
+                        mutils.print("  {}".format(e), color=mutils.Color.red)
 
                         if e.help:
                             help = textwrap.wrap(
                                 e.help, initial_indent="  ", subsequent_indent="  "
                             )
-                            print(
-                                management_utils.color(
-                                    "\n".join(help), management_utils.COLOR_YELLOW
-                                )
-                            )
+                            mutils.print("\n".join(help), color=mutils.Color.yellow)
 
                         failed = True
                         if fast:
@@ -170,17 +154,11 @@ class Command(management_utils.CommandBase):
                         if verbose:
                             print("-" * 80)
 
-                        print(
-                            management_utils.color(
-                                "  installed successfully", management_utils.COLOR_GREEN
-                            )
+                        mutils.print(
+                            "  installed successfully", color=mutils.Color.green
                         )
                 else:
-                    print(
-                        management_utils.color(
-                            "  no dependencies found", management_utils.COLOR_DIM
-                        )
-                    )
+                    mutils.print("  no dependencies found", style=mutils.Style.dim)
 
         if failed:
             exit(1)

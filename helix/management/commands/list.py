@@ -3,10 +3,10 @@ import textwrap
 from ... import utils
 from ... import exceptions
 
-from .. import utils as management_utils
+from .. import utils as mutils
 
 
-class Command(management_utils.CommandBase):
+class Command(mutils.CommandBase):
     """Print details about blueprints, components, and transforms.
 
     .. code-block:: none
@@ -129,27 +129,15 @@ class Command(management_utils.CommandBase):
         classes = utils.load(entrypoint)
         classes = sorted(classes, key=lambda c: c.name)
 
-        print(
-            management_utils.color(
-                "{}:".format(verbose_entrypoint_name),
-                management_utils.COLOR_BOLD,
-            )
-        )
+        mutils.print("{}:".format(verbose_entrypoint_name), style=mutils.Style.bold)
 
         for c in classes:
             print("  {}".format(c.string()))
 
             if verbose:
-                print(
-                    management_utils.color(
-                        "    Type: {}".format(c.type), management_utils.COLOR_DIM
-                    )
-                )
-                print(
-                    management_utils.color(
-                        "    Description: {}".format(c.description),
-                        management_utils.COLOR_DIM,
-                    )
+                mutils.print("    Type: {}".format(c.type), color=mutils.Color.dim)
+                mutils.print(
+                    "    Description: {}".format(c.description), color=mutils.Color.dim
                 )
 
         if not classes:
@@ -216,7 +204,7 @@ class Command(management_utils.CommandBase):
                 else:
                     classes = utils.load("helix.{}".format(part))
             except exceptions.EntrypointNotFound as e:
-                print(management_utils.color(e, management_utils.COLOR_RED))
+                mutils.print(e, color=mutils.Color.red)
                 exit(1)
 
             if search:
@@ -226,46 +214,28 @@ class Command(management_utils.CommandBase):
 
             for c in classes:
 
-                print(
-                    management_utils.color(
-                        "  {}".format(c.string()), management_utils.COLOR_BOLD
-                    )
-                )
+                mutils.print("  {}".format(c.string()), style=mutils.Style.bold)
 
                 if options.get("description") or verbose:
-                    print(
-                        "    Description: {}".format(
-                            management_utils.color(
-                                c.description,
-                                management_utils.COLOR_DIM,
-                            )
-                        )
-                    )
+                    print("    Description: ", end="")
+                    mutils.print(c.description, style=mutils.Style.dim)
 
                 if options.get("type") or vvverbose:
-                    print(
-                        "    Type: {}".format(
-                            management_utils.color(c.type, management_utils.COLOR_DIM)
-                        )
-                    )
+                    print("    Type: ", end="")
+                    mutils.print(c.type, style=mutils.Style.dim)
 
                     if hasattr(c, "blueprints"):
-                        print(
-                            "    Blueprints: {}".format(
-                                management_utils.color(
-                                    ", ".join(c.blueprints), management_utils.COLOR_DIM
-                                )
-                            )
-                        )
+                        print("    Blueprints: ", end="")
+                        mutils.print(", ".join(c.blueprints), style=mutils.Style.dim)
 
                 if options.get("tags") or verbose:
                     if isinstance(c.tags, (tuple, list)):
                         output = "Tags:"
 
                         for key, value in sorted(c.tags, key=lambda t: t[0]):
-                            output += management_utils.color(
+                            output += mutils.format(
                                 " ({}:{})".format(key, value),
-                                management_utils.COLOR_DIM,
+                                style=mutils.Style.dim,
                             )
 
                         output = textwrap.wrap(
@@ -293,8 +263,8 @@ class Command(management_utils.CommandBase):
                                 )
                             )
 
-                        output += management_utils.color(
-                            ", ".join(parameters), management_utils.COLOR_DIM
+                        output += mutils.format(
+                            ", ".join(parameters), style=mutils.Style.dim
                         )
 
                         print(output)
@@ -307,9 +277,7 @@ class Command(management_utils.CommandBase):
                         for dependency in c.dependencies:
                             deps.append(dependency.string())
 
-                        output += management_utils.color(
-                            ", ".join(deps), management_utils.COLOR_DIM
-                        )
+                        output += mutils.format(", ".join(deps), style=mutils.Style.dim)
 
                         output = textwrap.wrap(
                             output,
