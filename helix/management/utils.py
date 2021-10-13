@@ -6,6 +6,8 @@ https://docs.djangoproject.com/en/1.11/howto/custom-management-commands/
 """
 
 import abc
+import sys
+import enum
 import pkgutil
 
 from . import exceptions
@@ -27,35 +29,84 @@ def confirm(message=None):
     return True
 
 
-COLOR_BOLD = "\033[1m"
-COLOR_DIM = "\033[2m"
-COLOR_RED = "\033[91m"
-COLOR_GREEN = "\033[92m"
-COLOR_YELLOW = "\033[93m"
-COLOR_BLUE = "\033[94m"
-COLOR_PINK = "\033[95m"
-COLOR_CYAN = "\033[96m"
-COLOR_WHITE = "\033[97m"
-COLOR_END = "\033[0m"
+class Style(enum.Enum):
+    """Terminal style storage Enum."""
+
+    none = ""
+
+    bold = "\033[1m"
+    dim = "\033[2m"
 
 
-def color(message, color=None):
+class Color(enum.Enum):
+    """Terminal color storage Enum."""
+
+    none = ""
+
+    red = "\033[91m"
+    green = "\033[92m"
+    yellow = "\033[93m"
+    blue = "\033[94m"
+    pink = "\033[95m"
+    cyan = "\033[96m"
+    white = "\033[97m"
+
+
+END = "\033[0m"
+
+
+def format(message, style=None, color=None):
     """Format a message with terminal colors.
+
+    This is intelligent enough to not apply color formatting when the output
+    file descriptor would not support it.
 
     Args:
         message (str): A string message to format.
-        color (str): The color to print - select from COLOR_* constants in this
-            module. If this is not provided, this function does nothing.
+        style (str): The sttyle to print - select from the Style Enum.
+            Optional.
+        color (str): The color to print - select from the Color Enum. Optional.
 
     Returns:
-        A formatted message in the given color. You can pass this directoy to
+        A formatted message in the given color. You can pass this directly to
         ``print``.
     """
 
-    if color is None:
+    if not sys.stdout.isatty():
         return message
 
-    return "{}{}{}".format(color, message, COLOR_END)
+    if style is None:
+        style = Style.none
+    elif not isinstance(style, Style):
+        raise ValueError("unknown style: {}".format(style))
+
+    if color is None:
+        color = Color.none
+    elif not isinstance(color, Color):
+        raise ValueError("unknown color: {}".format(color))
+
+    return "{}{}{}{}".format(style.value, color.value, message, END)
+
+
+_print = print
+
+
+def print(*args, style=None, color=None, **kwargs):
+    """An augmented version of print that supports terminal colors.
+
+    All args/kwargs to the default python ``print()`` function are supported.
+
+    Arguments:
+        color(str): The color to apply.
+        style(str): The style to apply.
+    """
+
+    modified = []
+
+    for arg in args:
+        modified.append(format(arg, color=color, style=style))
+
+    _print(*modified, **kwargs)
 
 
 class CommandBase(object, metaclass=abc.ABCMeta):

@@ -62,19 +62,16 @@ class Metadata(object, metaclass=abc.ABCMeta):
 
         return ""
 
-    @property
-    def tags(self):
-        """An optional iterable of human-readable tag tuples.
+    tags = ()
+    """An optional iterable of human-readable tag tuples.
 
-        Tags may represent family or component groupings and are fairly loosely
-        defined.
+    Tags may represent family or component groupings and are fairly loosely
+    defined.
 
-        Example:
-            An ``APT29``/``SEDINT`` sample may be defined as
-            ``(("family", "APT29"), ("sample", "SEDINT"))``
-        """
-
-        return ()
+    Example:
+        An ``APT29``/``SEDINT`` sample may be defined as
+        ``(("family", "APT29"), ("sample", "SEDINT"))``
+    """
 
     @classmethod
     def string(cls):

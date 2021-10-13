@@ -45,23 +45,23 @@ pip install helix
 
 Some Blueprints, Components, and Transforms include additional, non-python
 dependencies that must be installed separately. These can be installed
-automatically (if supported) with the `dependencies` command. For example, to
+automatically (if supported) with the `install` command. For example, to
 install dependencies for the `upx` Transform, run:
 
 ```bash
-helix dependencies transform upx
+helix install transforms upx
 ```
 
 To install all dependencies for all installed Blueprints, Components, and
 Transforms, run:
 
 ```bash
-helix dependencies all
+helix install
 ```
 
 Note: some Blueprints, Components, and Transforms include dependencies which
-must be manually installed. Using the `dependencies` command for these will
-instead list the dependencies that must be installed manually.
+must be manually installed. Using the `install` command for these will instead
+list the dependencies that must be installed manually.
 
 ## Usage
 

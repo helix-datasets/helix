@@ -5,10 +5,10 @@ from ... import build
 from ... import utils
 from ... import exceptions
 
-from .. import utils as management_utils
+from .. import utils as mutils
 
 
-class Command(management_utils.CommandBase):
+class Command(mutils.CommandBase):
     """Build a blueprint with a set of components and transforms.
 
     .. code-block:: none
@@ -96,7 +96,7 @@ class Command(management_utils.CommandBase):
             exceptions.MissingDependency,
             exceptions.BuildFailure,
         ) as e:
-            print(management_utils.color(e, management_utils.COLOR_RED))
+            mutils.print(e, color=mutils.Color.red)
             exit(1)
 
         print("Tags: ")

@@ -5,7 +5,7 @@ python: 3.8
 install:
   - pip install .[testing,development]
 before_script:
-  - sudo $(which helix) dependencies all
+  - sudo $(which helix) install
 script:
   - helix test system -v 2
   - helix test unit -v 2
@@ -32,10 +32,11 @@ jobs:
         - choco install python --version 3.8.0
         - python -m pip install --upgrade pip
       before_script:
-        - helix dependencies all
+        - helix install
       env: PATH=/c/Python38:/c/Python38/Scripts:$PATH
 
     - stage: deploy
+      before_script: skip
       script: python setup.py sdist
       deploy:
       - provider: pypi
