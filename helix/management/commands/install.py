@@ -7,7 +7,7 @@ from .. import utils as management_utils
 
 
 class Command(management_utils.CommandBase):
-    """Install external install.
+    """Install external dependencies.
 
     .. code-block:: none
 
