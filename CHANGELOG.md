@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Renamed the `dependencies` command to `install` - changed the CLI slightly
   and added a few quality of life features
+- `LinuxAPTDependency` now automatically attempts to elevate if `apt update`
+  fails.
 
 ### Fixed
 - Terminal colors are no longer used when they are not supported by `stdout`
