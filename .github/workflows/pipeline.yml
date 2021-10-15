@@ -67,7 +67,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[testing,development]
       - name: Build
-        run: python setup.py sdist
+        run: python setup.py sdist bdist_wheel
       - name: Deploy
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
