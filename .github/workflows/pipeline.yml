@@ -9,6 +9,7 @@ on:
 
 jobs:
   Lint:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -53,7 +54,7 @@ jobs:
           helix test integration -v 2
 
   Deploy:
-    needs: test
+    #needs: test
     #if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
