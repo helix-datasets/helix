@@ -1,7 +1,7 @@
 os: linux
-dist: xenial
+dist: focal
 language: python
-python: 3.8
+python: "3.8"
 install:
   - pip install .[testing,development]
 before_script:
@@ -18,13 +18,15 @@ jobs:
 
     - stage: test
       name: "Python 3.6 on Linux"
-      python: 3.6
+      python: "3.6"
     - name: "Python 3.7 on Linux"
-      python: 3.7
+      python: "3.7"
     - name: "Python 3.8 on Linux"
-      python: 3.8
+      python: "3.8"
     - name: "Python 3.9 on Linux"
-      python: 3.9
+      python: "3.9"
+    - name: "Python 3.10 on Linux"
+      python: "3.10"
     - name: "Python 3.8 on Windows"
       os: windows
       language: shell
