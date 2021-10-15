@@ -3,13 +3,12 @@ name: Pipeline
 on:
   push:
   pull_request:
-    branches: [ $default-branch ]
+    branches: [$default-branch]
   release: 
     types: [released]
 
 jobs:
   Lint:
-    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -27,8 +26,7 @@ jobs:
 
   Test:
     needs: lint
-    if: false
-    #if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
       matrix:
@@ -54,8 +52,8 @@ jobs:
           helix test integration -v 2
 
   Deploy:
-    #needs: test
-    #if: github.event_name == 'release'
+    needs: test
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -72,5 +70,4 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           user: __token__
-          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-          repository_url: https://test.pypi.org/legacy/
+          password: ${{ secrets.PYPI_API_TOKEN }}
