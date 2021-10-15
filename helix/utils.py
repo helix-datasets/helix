@@ -631,7 +631,7 @@ class Dependable(object, metaclass=abc.ABCMeta):
 
         if not self.installed():
             raise exceptions.NotInstalled(
-                "dependencies have not been installed for {} (hint: use the `dependencies` command to install them)".format(
+                "dependencies have not been installed for {} (hint: use the `install` command to install them)".format(
                     self.__class__.__name__
                 )
             )
