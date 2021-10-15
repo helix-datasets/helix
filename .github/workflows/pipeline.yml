@@ -1,7 +1,7 @@
 name: Pipeline
 
 on:
-  push:
+  push
   pull_request:
     branches: [$default-branch]
   release: 
