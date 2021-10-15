@@ -431,22 +431,36 @@ class LinuxAPTDependency(Dependency):
         if not apt:
             raise exceptions.MissingDependency("APT is not installed on this platform")
 
-        run(
-            "{} update".format(apt),
-            ".",
-            exceptions.DependencyInstallationFailure(
-                "`apt update` failed (hint: do you have permission to install packages?)"
-            ),
-            propagate=verbose,
+        def command(cmd, sudo=False, error=None):
+            sudo = "sudo" if sudo else ""
+
+            run(
+                "{} {} {}".format(sudo, apt, cmd),
+                ".",
+                error,
+                propagate=verbose,
+            )
+
+        sudo = False
+        permissions = exceptions.DependencyInstallationFailure(
+            "`apt update` failed (hint: do you have permission to install packages?)"
         )
 
-        run(
-            "{} install -y {}".format(apt, self.package),
-            ".",
-            exceptions.DependencyInstallationFailure(
+        try:
+            command("update", sudo=sudo, error=permissions)
+        except exceptions.DependencyInstallationFailure:
+            if verbose:
+                print("\nfailed to install: attempting to elevate\n")
+
+            sudo = True
+            command("update", sudo=sudo, error=permissions)
+
+        command(
+            "install -y {}".format(self.package),
+            sudo=sudo,
+            error=exceptions.DependencyInstallationFailure(
                 "failed to install {}".format(self.package)
             ),
-            propagate=verbose,
         )
 
     def installed(self):

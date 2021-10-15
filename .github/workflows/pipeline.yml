@@ -1,9 +1,26 @@
-name: pipeline
+name: Pipeline
 
 on: [push, pull_request]
 
 jobs:
-  pipeline:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[testing,development]
+      - name: Lint
+        run: |
+          black --check ./
+          flake8 ./
+
+  Test:
+    needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -20,14 +37,28 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install .[testing,development]
-      - name: Lint
-        run: |
-          black --check ./
-          flake8 ./
       - name: Setup
-        run: helix install
+        run: helix install -v
       - name: Test
         run: |
           helix test system -v 2
           helix test unit -v 2
           helix test integration -v 2
+
+  Deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install .[testing,development]
+      - name: Build
+        run: python setup.py sdist
+      - name: Deploy
+        run: |
+          echo "push to PyPI here"
