@@ -1,11 +1,11 @@
 name: Pipeline
 
 on:
+  push:
+  pull_request:
+    branches: [main]
   release: 
     types: [released]
-  pull_request:
-    branches: [$default-branch]
-  push:
 
 jobs:
   Lint:
