@@ -6,17 +6,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Travis CI testing and deployment
+- Travis CI testing and deployment.
 - `WindowsChocolateyDependency` for automatically installing dependencies from
-  the Chocolatey package manager
-- Additional information, filtering, and search to the `list` command
+  the Chocolatey package manager.
+- Additional information, filtering, and search to the `list` command.
+- Added explicit support for Python 3.10.
 
 ### Changed
 - Renamed the `dependencies` command to `install` - changed the CLI slightly
-  and added a few quality of life features
+  and added a few quality of life features.
+
+### Removed
+- Removed explicit support for Python 3.5 (end-of-life).
 
 ### Fixed
-- Terminal colors are no longer used when they are not supported by `stdout`
+- Terminal colors are no longer used when they are not supported by `stdout`.
 
 ## [1.1.1] - 2021-09-14
 ### Added
