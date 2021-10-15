@@ -1,6 +1,11 @@
 name: Pipeline
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    branches: [ $default-branch ]
+  release: 
+    types: [released]
 
 jobs:
   Lint:
@@ -21,6 +26,8 @@ jobs:
 
   Test:
     needs: lint
+    if: false
+    #if: github.event_name == 'pull_request'
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +54,7 @@ jobs:
 
   Deploy:
     needs: test
+    #if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -60,5 +68,8 @@ jobs:
       - name: Build
         run: python setup.py sdist
       - name: Deploy
-        run: |
-          echo "push to PyPI here"
+        uses: pypa/gh-action-pypi-publish@release/v1
+          with:
+            user: __token__
+            password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+            repository_url: https://test.pypi.org/legacy/
