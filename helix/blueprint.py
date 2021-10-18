@@ -128,10 +128,10 @@ class Blueprint(utils.Metadata, utils.Dependable, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def generate(self, directory):
-        """Generates a source directory from an interable of components.
+        """Generates a source directory from an iterable of components.
 
-        The components passed to this class wll be finalized prior to calling
-        this so that their source code is readily available.  This function is
+        The components passed to this class will be finalized prior to calling
+        this so that their source code is readily available. This function is
         responsible for writing configured components to the target output
         directory.
 
@@ -164,6 +164,10 @@ class Blueprint(utils.Metadata, utils.Dependable, metaclass=abc.ABCMeta):
 
         for transform in transforms:
             transformed = False
+
+            if not targets:
+                transformed = True
+
             for target in targets:
                 transformed_target = "{}.transformed".format(target)
                 if transform.supported(target):
