@@ -623,10 +623,10 @@ class TestBlueprint(blueprint.Blueprint):
     callsites = [CALLSITE_TEST]
 
     def generate(self, output):
-        pass
+        return []
 
-    def compile(self, directory, stdout=None, stderr=None):
-        pass
+    def compile(self, directory, options):
+        return []
 
 
 class BlueprintTests(unittest.TestCase):
@@ -805,7 +805,7 @@ class BuildTests(unittest.TestCase):
     def test_minimal_build(self):
         configuration = {
             "name": "test",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [],
             "transforms": [],
         }
@@ -819,18 +819,18 @@ class BuildTests(unittest.TestCase):
     def test_example_build(self):
         configuration = {
             "name": "example",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [
-                {"name": "minimal-example", "configuration": {}},
+                {"class": TestComponent, "configuration": {}},
                 {
-                    "name": "configuration-example",
-                    "configuration": {"second_word": "example"},
+                    "class": TestComponent,
+                    "configuration": {"test": "example"},
                 },
             ],
             "transforms": [
                 {
-                    "name": "replace-example",
-                    "configuration": {"old": "hello", "new": "goodbye"},
+                    "class": TestTransform,
+                    "configuration": {"test": "value"},
                 },
             ],
         }
@@ -843,7 +843,7 @@ class BuildTests(unittest.TestCase):
 
     def test_missing_name(self):
         configuration = {
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [],
             "transforms": [],
         }
@@ -864,7 +864,7 @@ class BuildTests(unittest.TestCase):
     def test_missing_components(self):
         configuration = {
             "name": "test",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "transforms": [],
         }
 
@@ -876,7 +876,7 @@ class BuildTests(unittest.TestCase):
     def test_missing_transforms(self):
         configuration = {
             "name": "test",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [],
         }
 
@@ -888,10 +888,10 @@ class BuildTests(unittest.TestCase):
     def test_missing_configuration(self):
         configuration = {
             "name": "example",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [
                 {
-                    "name": "minimal-example",
+                    "class": TestComponent,
                 },
             ],
             "transforms": [],
@@ -906,7 +906,7 @@ class BuildTests(unittest.TestCase):
     def test_malformed_component(self):
         configuration = {
             "name": "test",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [{"test": "test"}],
             "transforms": [],
         }
@@ -919,7 +919,7 @@ class BuildTests(unittest.TestCase):
     def test_malformed_transform(self):
         configuration = {
             "name": "test",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [],
             "transforms": [{"test": "test"}],
         }
@@ -929,29 +929,11 @@ class BuildTests(unittest.TestCase):
         with self.assertRaises(exceptions.ConfigurationError):
             build.build(configuration, working.name)
 
-    def test_specification_by_class(self):
-        component = utils.load("helix.components", "minimal-example")
-
-        configuration = {
-            "name": "example",
-            "blueprint": {"name": "cmake-cpp"},
-            "components": [{"class": component}],
-            "transforms": [],
-        }
-
-        working = tempfile.TemporaryDirectory()
-
-        artifacts, tags = build.build(configuration, working.name)
-
-        self.assertIsNotNone(artifacts)
-
     def test_specification_by_both_name_and_class(self):
-        component = utils.load("helix.components", "minimal-example")
-
         configuration = {
             "name": "example",
-            "blueprint": {"name": "cmake-cpp"},
-            "components": [{"name": "invalid-component", "class": component}],
+            "blueprint": {"class": TestBlueprint},
+            "components": [{"name": "invalid-component", "class": TestComponent}],
             "transforms": [],
         }
 
@@ -964,7 +946,7 @@ class BuildTests(unittest.TestCase):
     def test_specification_invalid_name(self):
         configuration = {
             "name": "example",
-            "blueprint": {"name": "cmake-cpp"},
+            "blueprint": {"class": TestBlueprint},
             "components": [{"name": "invalid-component"}],
             "transforms": [],
         }
