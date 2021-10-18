@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Travis CI testing and deployment.
+- GitHub Actions automated testing and deployment.
 - `WindowsChocolateyDependency` for automatically installing dependencies from
   the Chocolatey package manager.
 - Additional information, filtering, and search to the `list` command.
