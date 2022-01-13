@@ -91,13 +91,14 @@ class Configurable(object, metaclass=abc.ABCMeta):
     ``configure``.
 
     Example:
+
         A subclass with both required and default parameters may be defined
         as::
 
-        options = {
-            "server": {},
-            "port": {"default": 1337}
-        }
+            options = {
+                "server": {},
+                "port": {"default": 1337}
+            }
     """
 
     def validate_configuration(self):
