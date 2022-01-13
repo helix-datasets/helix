@@ -4,7 +4,6 @@
 
 [![code-style-image]][black]
 [![documentation-image]][readthedocs]
-[![build-image]][travis]
 [![latest-version-image]][pypi]
 [![python-versions-image]][python]
 [![license-image]][mit]
@@ -167,8 +166,6 @@ Defense.
 [black]: https://github.com/psf/black
 [documentation-image]: https://img.shields.io/readthedocs/helix-datasets
 [readthedocs]: https://helix-datasets.readthedocs.io/
-[build-image]: https://img.shields.io/travis/com/helix-datasets/helix/main
-[travis]: https://app.travis-ci.com/github/helix-datasets/helix
 [latest-version-image]: https://img.shields.io/pypi/v/helix
 [pypi]: https://pypi.org/project/helix/
 [python-versions-image]: https://img.shields.io/pypi/pyversions/helix
