@@ -3,7 +3,7 @@ name: Tag
 on:
   push:
     tags: 
-      - 'v*'
+      - v*
 
 jobs:
   Release:
@@ -21,7 +21,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
       - name: Notes
         run: |
-          VERSION=${GITHUB_REF/refs\/tags\//}
+          VERSION=${GITHUB_REF/refs\/tags\/v/}
           sed "1,/## \[$VERSION\]/d;/\[/Q" CHANGELOG.md > RELEASE-CHANGES.md
       - name: Release (Draft)
         uses: softprops/action-gh-release@v1
