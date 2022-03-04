@@ -194,4 +194,4 @@ def load(f):
         except:
             pass
 
-    raise ValueError("unsupported Component storage format")
+    raise ValueError("invalid file or unsupported Component storage format")

@@ -1,6 +1,5 @@
 import textwrap
 
-from ... import component
 from ... import utils
 from ... import exceptions
 
@@ -126,7 +125,7 @@ class Command(mutils.CommandBase):
             "--load",
             metavar="file",
             type=str,
-            help="load component(s) from a given file instead of listing system-installed components",
+            help="load component(s) from a given file instead of using system-installed components",
         )
 
         transform_parser = subparsers.add_parser("transforms", help="list transforms")
@@ -204,15 +203,7 @@ class Command(mutils.CommandBase):
 
         for part in parts:
             if load:
-                try:
-                    with open(load, "r") as f:
-                        classes = component.load(f)
-                except ValueError as e:
-                    mutils.print("{}: {}".format(load, e), color=mutils.Color.red)
-                    exit(1)
-                except Exception as e:
-                    mutils.print(e, color=mutils.Color.red)
-                    exit(1)
+                classes = mutils.load(load)
             else:
                 try:
                     if names:

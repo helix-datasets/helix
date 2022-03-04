@@ -12,6 +12,8 @@ import pkgutil
 
 from . import exceptions
 
+from .. import component
+
 
 def confirm(message=None):
     if message is not None:
@@ -107,6 +109,29 @@ def print(*args, style=None, color=None, **kwargs):
         modified.append(format(arg, color=color, style=style))
 
     _print(*modified, **kwargs)
+
+
+def load(*files):
+    """Load Component(s) from one or more files.
+
+    Args:
+        *files: one or more files to attempt to load.
+    """
+
+    components = []
+
+    for name in files:
+        try:
+            with open(name, "r") as f:
+                components += component.load(f)
+        except ValueError as e:
+            print("{}: {}".format(name, e), color=Color.red)
+            exit(1)
+        except Exception as e:
+            print(e, color=Color.red)
+            exit(1)
+
+    return components
 
 
 class CommandBase(object, metaclass=abc.ABCMeta):
