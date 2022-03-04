@@ -113,7 +113,7 @@ class Command(mutils.CommandBase):
             failed = False
 
             for c in classes:
-                mutils.print(c.string(), style=mutils.Style.bold)
+                mutils.print(c().string(), style=mutils.Style.bold)
 
                 if c.dependencies:
                     if c.installed():
