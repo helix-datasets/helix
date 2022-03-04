@@ -77,7 +77,7 @@ class Metadata(object, metaclass=abc.ABCMeta):
         return "{} ({}) [{}]".format(self.verbose_name, self.version, self.name)
 
     def __str__(self):
-        return self.__class__.string()
+        return self.string()
 
 
 class Configurable(object, metaclass=abc.ABCMeta):
