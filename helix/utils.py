@@ -16,9 +16,8 @@ class Metadata(object, metaclass=abc.ABCMeta):
     def name(self):
         """A simple name.
 
-        Names should consist of `[a-z-]`. Make use of the optional
-        ``verbose_name`` property if you would like a pretty-printable version
-        of this name.
+        Names should consist of `[a-z-]`. Make use of the ``verbose_name``
+        property if you would like a pretty-printable version of this name.
         """
 
         return ""
@@ -26,12 +25,9 @@ class Metadata(object, metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def verbose_name(self):
-        """Optional verbose name for pretty printing.
+        """Verbose name for pretty printing."""
 
-        By default this will just return ``name``.
-        """
-
-        return self.name
+        return ""
 
     @property
     @abc.abstractmethod
@@ -73,11 +69,12 @@ class Metadata(object, metaclass=abc.ABCMeta):
         ``(("family", "APT29"), ("sample", "SEDINT"))``
     """
 
+    @classmethod
     def string(self):
         return "{} ({}) [{}]".format(self.verbose_name, self.version, self.name)
 
     def __str__(self):
-        return self.string()
+        return self.__class__.string()
 
 
 class Configurable(object, metaclass=abc.ABCMeta):

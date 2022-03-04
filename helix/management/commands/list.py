@@ -216,8 +216,6 @@ class Command(mutils.CommandBase):
                     mutils.print(e, color=mutils.Color.red)
                     exit(1)
 
-            classes = [c() for c in classes]
-
             if search:
                 classes = self.search(classes, search)
 

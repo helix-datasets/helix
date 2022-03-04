@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their own Component save/load functionality.
 - Support for Component `Loader` interface to CLI commands.
 
+### Fixed
+- Correct documentation for `verbose_name` - property not optional.
+
 ## [1.2.0] - 2022-01-18
 ### Added
 - GitHub Actions automated testing and deployment.
