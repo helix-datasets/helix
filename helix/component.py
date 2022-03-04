@@ -136,3 +136,58 @@ class Component(
             )
 
         self.finalized = True
+
+
+class Loader(metaclass=abc.ABCMeta):
+    """A method of loading one or more Components from a file.
+
+    This interface allows external libraries which expose Components to support
+    loading those components from a file. This can be useful for libraries
+    which cannot expose components as an entrypoint for whatever reason (e.g.,
+    there are far too many Components to reasonably expose).
+
+    Implementing libraries should expose their Loader by their library name at
+    the ``helix.components.loaders`` entrypoint.
+    """
+
+    @abc.abstractmethod
+    def load(self, f):
+        """Implement Component loading here.
+
+        Args:
+            f (file): A file-like object from which to read.
+
+        Returns:
+            A list of ready to use Component classes.
+        """
+
+        return []
+
+
+def load(f):
+    """Load a list of Components from a file.
+
+    This attempts to load one or more Components from the given file using
+    any installed and available Component Loader.
+
+    Args:
+        f (file): A file-like object from which to read.
+
+    Returns:
+        A list of ready to use Component classes.
+
+    Raises:
+        An Exception if the given file cannot be parsed with any installed
+        loader.
+    """
+
+    try:
+        loaders = utils.load("helix.components.loaders")
+    except exceptions.EntrypointNotFound:
+        raise NotImplementedError("no Loaders currently installed")
+
+    for loader in loaders:
+        f.seek(0)
+        return loader().load(f)
+
+    raise ValueError("unsupported Component storage format")
