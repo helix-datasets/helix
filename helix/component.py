@@ -184,10 +184,14 @@ def load(f):
     try:
         loaders = utils.load("helix.components.loaders")
     except exceptions.EntrypointNotFound:
-        raise NotImplementedError("no Loaders currently installed")
+        raise NotImplementedError("no component loaders currently installed")
 
     for loader in loaders:
         f.seek(0)
-        return loader().load(f)
+
+        try:
+            return loader().load(f)
+        except:
+            pass
 
     raise ValueError("unsupported Component storage format")

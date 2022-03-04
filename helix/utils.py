@@ -73,9 +73,8 @@ class Metadata(object, metaclass=abc.ABCMeta):
         ``(("family", "APT29"), ("sample", "SEDINT"))``
     """
 
-    @classmethod
-    def string(cls):
-        return "{} ({}) [{}]".format(cls.verbose_name, cls.version, cls.name)
+    def string(self):
+        return "{} ({}) [{}]".format(self.verbose_name, self.version, self.name)
 
     def __str__(self):
         return self.__class__.string()
