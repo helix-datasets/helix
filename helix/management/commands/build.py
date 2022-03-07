@@ -31,9 +31,19 @@ class Command(mutils.CommandBase):
         subparsers = parser.add_subparsers(dest="subcommand")
         subparsers.required = True
 
+        def common(subparser):
+            subparser.add_argument(
+                "-l",
+                "--load",
+                metavar="file",
+                type=str,
+                help="load additional component(s) from a given file",
+            )
+
         blueprint_parser = subparsers.add_parser(
             "blueprint", help="manually specify blueprint, components, and transforms"
         )
+        common(blueprint_parser)
         blueprint_parser.add_argument("blueprint", help="blueprint (by name)")
         blueprint_parser.add_argument(
             "-c", "--components", help="component(s) (by name)", nargs="*", default=[]
@@ -53,6 +63,7 @@ class Command(mutils.CommandBase):
         json_parser = subparsers.add_parser(
             "json", help="build from a json configuration file"
         )
+        common(json_parser)
         json_parser.add_argument("input", help="input json file")
         json_parser.add_argument("output", help="output file or directory")
         json_parser.add_argument(
@@ -73,6 +84,7 @@ class Command(mutils.CommandBase):
             configuration["components"] = [
                 utils.parse(c) for c in options["components"]
             ]
+
             configuration["transforms"] = [
                 utils.parse(t) for t in options["transforms"]
             ]
@@ -81,6 +93,19 @@ class Command(mutils.CommandBase):
                 configuration = json.load(f)
         else:
             raise Exception("unknown command: {}".format(options["subcommand"]))
+
+        load = options.get("load")
+
+        if load:
+            components = mutils.load(load)
+
+            for specification in configuration["components"]:
+                name = specification["name"]
+
+                for c in components:
+                    if c().name == name:
+                        specification["class"] = c
+                        specification.pop("name")
 
         try:
             artifacts, tags = build.build(

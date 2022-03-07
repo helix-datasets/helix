@@ -120,6 +120,13 @@ class Command(mutils.CommandBase):
         component_parser = subparsers.add_parser("components", help="list components")
         category(component_parser, "component")
         common(component_parser)
+        component_parser.add_argument(
+            "-l",
+            "--load",
+            metavar="file",
+            type=str,
+            help="load component(s) from a given file instead of using system-installed components",
+        )
 
         transform_parser = subparsers.add_parser("transforms", help="list transforms")
         category(transform_parser, "transform")
@@ -187,6 +194,7 @@ class Command(mutils.CommandBase):
         vvverbose = options.get("very_very_verbose")
         vverbose = options.get("very_verbose") or vvverbose
         verbose = options.get("verbose") or vverbose
+        load = options.get("load")
 
         if part is None:
             parts = ["blueprints", "components", "transforms"]
@@ -194,26 +202,28 @@ class Command(mutils.CommandBase):
             parts = [part]
 
         for part in parts:
-            print("{}:".format(part.title()))
-
-            try:
-                if names:
-                    classes = []
-                    for name in names:
-                        classes.append(utils.load("helix.{}".format(part), name))
-                else:
-                    classes = utils.load("helix.{}".format(part))
-            except exceptions.EntrypointNotFound as e:
-                mutils.print(e, color=mutils.Color.red)
-                exit(1)
+            if load:
+                classes = mutils.load(load)
+            else:
+                try:
+                    if names:
+                        classes = []
+                        for name in names:
+                            classes.append(utils.load("helix.{}".format(part), name))
+                    else:
+                        classes = utils.load("helix.{}".format(part))
+                except exceptions.EntrypointNotFound as e:
+                    mutils.print(e, color=mutils.Color.red)
+                    exit(1)
 
             if search:
                 classes = self.search(classes, search)
 
             classes = sorted(classes, key=lambda c: c.name)
 
-            for c in classes:
+            print("{}:".format(part.title()))
 
+            for c in classes:
                 mutils.print("  {}".format(c.string()), style=mutils.Style.bold)
 
                 if options.get("description") or verbose:

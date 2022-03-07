@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Component `Loader` interface which allows downstream libraries to implement
+  their own Component save/load functionality.
+- Support for Component `Loader` interface to CLI commands.
+
+### Fixed
+- Correct documentation for `verbose_name` - property not optional.
 
 ## [1.2.0] - 2022-01-18
 ### Added

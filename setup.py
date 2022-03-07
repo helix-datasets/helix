@@ -88,6 +88,7 @@ setup(
             "linux-openssl-aes-encrypt-data-encrypted = helix.components.attack.exfiltration.data_encrypted.openssl.aes.aes:AttackLinuxOpenSSLAESEncryptDataEncryptedComponent [linux]",
             "linux-openssl-aes-decrypt-data-encrypted = helix.components.attack.exfiltration.data_encrypted.openssl.aes.aes:AttackLinuxOpenSSLAESDecryptDataEncryptedComponent [linux]",
         ],
+        "helix.components.loaders": [],
         "helix.transforms": [
             "replace-example = helix.transforms.examples.replace.replace:ReplaceExampleTransform",
             "strip = helix.transforms.strip.strip:StripTransform [linux]",
