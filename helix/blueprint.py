@@ -21,9 +21,7 @@ class Blueprint(utils.Metadata, utils.Dependable, metaclass=abc.ABCMeta):
 
         return []
 
-    def __init__(
-        self, build_name=None, components=None, transforms=None, *args, **kwargs
-    ):
+    def __init__(self, build_name, components=None, transforms=None, *args, **kwargs):
         """Initialize the Blueprint.
 
         Complete a number of sanity checks, raising ``BlueprintNotSane`` if
@@ -34,8 +32,6 @@ class Blueprint(utils.Metadata, utils.Dependable, metaclass=abc.ABCMeta):
             components: An iterable of components to include.
             transforms: An iterable of transforms to include.
         """
-
-        build_name = build_name or "build"
 
         super().__init__(*args, **kwargs)
 

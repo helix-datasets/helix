@@ -177,8 +177,9 @@ def load(f):
         A list of ready to use Component classes.
 
     Raises:
-        An Exception if the given file cannot be parsed with any installed
-        loader.
+        ValueError: if the given file cannot be parsed with any installed
+            Component loader
+        NotImplementedError: if no Component loaders are installed.
     """
 
     try:

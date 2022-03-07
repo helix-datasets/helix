@@ -116,6 +116,9 @@ def load(*files):
 
     Args:
         *files: one or more files to attempt to load.
+
+    Returns:
+        A list of loaded Component(s).
     """
 
     components = []
