@@ -4,6 +4,8 @@ import copy
 import uuid
 import json
 import random
+import traceback
+import multiprocessing
 
 from ... import build
 from ... import utils
@@ -67,7 +69,7 @@ def walk(collection, samples, components):
     return options
 
 
-def process(blueprint, components, transforms, loads, working, verbose=False):
+def process(blueprint, components, transforms, loads, working):
     identifier = uuid.uuid4()
 
     configuration = {
@@ -90,28 +92,37 @@ def process(blueprint, components, transforms, loads, working, verbose=False):
 
     configuration["transforms"] = [utils.parse(t) for t in transforms]
 
-    name = "[{}]".format(", ".join(components))
+    project = os.path.join(working, identifier.hex)
 
-    try:
-        _, tags = build.build(
-            configuration,
-            os.path.join(working, identifier.hex),
-            options={"propagate": verbose},
-        )
-    except (exceptions.BuildFailure, exceptions.ConfigurationError):
-        print(
-            "{} {} {}".format(
-                name,
-                mutils.format("✗", color=mutils.Color.red),
-                identifier.hex,
+    os.makedirs(project)
+
+    stdout = os.path.join(project, "stdout.txt")
+    stderr = os.path.join(project, "stderr.txt")
+
+    with open(stdout, "wb") as stdout, open(stderr, "wb") as stderr:
+        try:
+            _, tags = build.build(
+                configuration,
+                os.path.join(working, identifier.hex),
+                options={
+                    "stdout": stdout,
+                    "stderr": stderr,
+                },
             )
-        )
+        except Exception as e:
+            print(
+                "{} {}: {}".format(
+                    mutils.format("✗", color=mutils.Color.red), identifier.hex, e
+                )
+            )
 
-        return {}
+            with open(os.path.join(project, "exception.txt"), "w") as f:
+                traceback.print_exc(file=f)
+
+            return {}
 
     print(
-        "{} {} {}".format(
-            name,
+        "{} {}".format(
             mutils.format("✓", color=mutils.Color.green),
             identifier.hex,
         )
@@ -125,7 +136,30 @@ class Command(mutils.CommandBase):
 
     .. code-block:: none
 
-        TODO
+        usage: helix dataset-similarity [-h] [-c [COMPONENTS [COMPONENTS ...]]] [-l [file [file ...]]] [-t [TRANSFORMS [TRANSFORMS ...]]] [-s SAMPLE_COUNT]
+                                        [-m MAXIMUM_SAMPLES] [-n COMPONENT_COUNT] [-w WORKERS] [-v]
+                                        {simple,random,walk} output
+
+        positional arguments:
+          {simple,random,walk}  dataset generation strategy
+          output                output directory where dataset should be written
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          -c [COMPONENTS [COMPONENTS ...]], --components [COMPONENTS [COMPONENTS ...]]
+                                component(s) to include (by name)
+          -l [file [file ...]], --load [file [file ...]]
+                                load additional component(s) from one or more files
+          -t [TRANSFORMS [TRANSFORMS ...]], --transforms [TRANSFORMS [TRANSFORMS ...]]
+                                transform(s) to apply to all samples (by name)
+          -s SAMPLE_COUNT, --sample-count SAMPLE_COUNT
+                                number of samples to attempt to generate
+          -m MAXIMUM_SAMPLES, --maximum-samples MAXIMUM_SAMPLES
+                                maximum number of samples to generate
+          -n COMPONENT_COUNT, --component-count COMPONENT_COUNT
+                                number of components per sample
+          -w WORKERS, --workers WORKERS
+                                number of parallel workers to use (default: <count(CPUs)/2>)
     """
 
     name = "dataset-similarity"
@@ -194,9 +228,6 @@ class Command(mutils.CommandBase):
             type=int,
             default=round(os.cpu_count() / 2),
             help="number of parallel workers to use (default: <count(CPUs)/2>)",
-        )
-        parser.add_argument(
-            "-v", "--verbose", action="store_true", help="build in verbose mode"
         )
 
     def handle(self, *args, **options):
@@ -275,18 +306,29 @@ class Command(mutils.CommandBase):
             mutils.print(e, color=mutils.Color.red)
             exit(1)
 
-        results = []
-        for sample in samples:
-            results.append(
-                process(
-                    blueprint,
-                    sample,
-                    transforms,
-                    options.get("load"),
-                    output,
-                    verbose=options.get("verbose"),
-                )
+        print(
+            "building {} samples with {} workers".format(
+                mutils.format(len(samples), style=mutils.Style.bold),
+                mutils.format(options["workers"], style=mutils.Style.bold),
             )
+        )
+
+        arguments = [
+            (
+                blueprint,
+                sample,
+                transforms,
+                options.get("load"),
+                output,
+            )
+            for sample in samples
+        ]
+
+        if options["workers"] == 1:
+            results = [process(*a) for a in arguments]
+        else:
+            with multiprocessing.Pool(options["workers"]) as pool:
+                results = pool.starmap(process, arguments)
 
         results = [r for r in results if r]
         if "maximum_samples" in options:
