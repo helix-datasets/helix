@@ -88,3 +88,9 @@ by running the following command:
 .. code-block:: bash
 
     helix build json configuration.json ./example
+
+External Components
+*******************
+
+The build commands also support loading Components from external sources and
+downstream libraries using the :class:`helix.component.Loader` interface.
