@@ -34,18 +34,18 @@ a few different configurations of the ``configuration-example`` Component.
 .. code-block:: bash
 
     helix dataset-similarity simple dataset \
-        -c configuration-example:second_word=world \
-        configuration-example:second_word=monde \
-        configuration-example:second_word=mondo \
-        configuration-example:second_word=mundo \
-        configuration-example:second_word=welt
+        -c configuration-example:first_word=hello,second_word=world \
+        configuration-example:first_word=bonjour,second_word='le monde' \
+        configuration-example:first_word=ciao,second_word=mondo \
+        configuration-example:first_word=hola,second_word=mundo \
+        configuration-example:first_word=hallo,second_word=welt
 
 The generated dataset consists of five samples, one for each included Component
 configuration. Build output is logged to the sample directories in ``dataset``
 and dataset labels are written to ``dataset/labels.json``.
 
 The ``simple`` strategy isn't much more than a sanity check - more
-sophisticated strategies are also supported ``random`` which randomly selects
+sophisticated strategies are also supported: ``random`` which randomly selects
 combinations of the provided Components and ``walk`` which randomly selects an
 initial combination of Components, then randomly permutes a small portion of
 them each time. Supported Transforms can also be applied to all samples in a
@@ -60,11 +60,11 @@ and applying the ``strip`` Transform to all samples:
         --sample-count 25 \
         --component-count 3 \
         -c minimal-example \
-        configuration-example:second_word=world \
-        configuration-example:second_word=monde \
-        configuration-example:second_word=mondo \
-        configuration-example:second_word=mundo \
-        configuration-example:second_word=welt \
+        configuration-example:first_word=hello,second_word=world \
+        configuration-example:first_word=bonjour,second_word='le monde' \
+        configuration-example:first_word=ciao,second_word=mondo \
+        configuration-example:first_word=hola,second_word=mundo \
+        configuration-example:first_word=hallo,second_word=welt \
         -t strip
 
 Generating Classification Datasets
