@@ -81,9 +81,27 @@ helix build blueprint cmake-cpp ./example \
     -t strip
 ```
 
-The `build` command also supports loading a configuration from a JSON file and
-HELIX is fairly scriptable. See the `examples/` directory or take a look at the
-full documentation for more.
+HELIX also includes some simple dataset generation tools. To generate a program
+similarity dataset of 25 samples consisting of 3 Components each using the
+``random`` strategy and selecting Components from a few different
+configurations of the example Components, run:
+
+```bash
+helix dataset-similarity random dataset \
+    --sample-count 25 \
+    --component-count 3 \
+    -c minimal-example \
+    configuration-example:first_word=hello,second_word=world \
+    configuration-example:first_word=bonjour,second_word='le monde' \
+    configuration-example:first_word=ciao,second_word=mondo \
+    configuration-example:first_word=hola,second_word=mundo \
+    configuration-example:first_word=hallo,second_word=welt \
+    -t strip
+```
+
+There's a lot more to HELIX including a scripting interface (see the
+`examples/` directory) and tutorials for new users. For more, check out the
+[full documentation](https://helix-datasets.readthedocs.io/). 
 
 ## Contributing
 
