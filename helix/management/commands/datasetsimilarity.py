@@ -1,17 +1,12 @@
 import os
 import math
 import copy
-import uuid
 import json
 import random
-import traceback
-import multiprocessing
-
-from ... import build
-from ... import utils
-from ... import exceptions
 
 from .. import utils as mutils
+
+from . import dataset
 
 
 class SamplingError(Exception):
@@ -69,70 +64,8 @@ def walk(collection, samples, components):
     return options
 
 
-def process(blueprint, components, transforms, loads, working):
-    identifier = uuid.uuid4()
-
-    configuration = {
-        "name": identifier.hex,
-        "blueprint": {"name": blueprint},
-    }
-
-    configuration["components"] = [utils.parse(c) for c in components]
-
-    if loads:
-        loaded = mutils.load(*loads)
-
-        for specification in configuration["components"]:
-            name = specification["name"]
-
-            for c in loaded:
-                if c().name == name:
-                    specification["class"] = c
-                    specification.pop("name")
-
-    configuration["transforms"] = [utils.parse(t) for t in transforms]
-
-    project = os.path.join(working, identifier.hex)
-
-    os.makedirs(project)
-
-    stdout = os.path.join(project, "stdout.txt")
-    stderr = os.path.join(project, "stderr.txt")
-
-    with open(stdout, "wb") as stdout, open(stderr, "wb") as stderr:
-        try:
-            _, tags = build.build(
-                configuration,
-                os.path.join(working, identifier.hex),
-                options={
-                    "stdout": stdout,
-                    "stderr": stderr,
-                },
-            )
-        except Exception as e:
-            print(
-                "{} {}: {}".format(
-                    mutils.format("✗", color=mutils.Color.red), identifier.hex, e
-                )
-            )
-
-            with open(os.path.join(project, "exception.txt"), "w") as f:
-                traceback.print_exc(file=f)
-
-            return {}
-
-    print(
-        "{} {}".format(
-            mutils.format("✓", color=mutils.Color.green),
-            identifier.hex,
-        )
-    )
-
-    return {identifier.hex: tags}
-
-
 class Command(mutils.CommandBase):
-    """Generate a dataset from a collection of Components.
+    """Generate a similarity dataset from a collection of Components.
 
     .. code-block:: none
 
@@ -242,46 +175,9 @@ class Command(mutils.CommandBase):
                 mutils.print(e, color=mutils.Color.red)
                 exit(1)
 
-        components = options.get("components")
-
-        try:
-            classes = [
-                utils.load("helix.components", utils.parse(c)["name"])
-                for c in components
-            ]
-        except exceptions.EntrypointNotFound as e:
-            mutils.print(e, color=mutils.Color.red)
-            exit(1)
-
-        if options.get("load"):
-            loaded = mutils.load(*options["load"])
-            components += [c.name for c in loaded]
-            classes += loaded
-
-        blueprints = set.intersection(*[set(c.blueprints) for c in classes])
-
-        if len(blueprints) > 1:
-            mutils.print(
-                "multiple possible blueprints found: {}".format(", ".join(blueprints)),
-                color=mutils.Color.red,
-            )
-            exit(1)
-        elif len(blueprints) < 1:
-            mutils.print(
-                "no common blueprint that supports all components could be found",
-                color=mutils.Color.red,
-            )
-            exit(1)
-
-        blueprint = blueprints.pop()
-
-        transforms = options.get("transforms")
-
-        try:
-            classes = [utils.load("helix.transforms", t) for t in transforms]
-        except exceptions.EntrypointNotFound as e:
-            mutils.print(e, color=mutils.Color.red)
-            exit(1)
+        blueprint, components, load, transforms = dataset.parse(
+            options["components"], options["load"], options["transforms"]
+        )
 
         if options["strategy"] == "simple":
             strategy = simple
@@ -306,29 +202,9 @@ class Command(mutils.CommandBase):
             mutils.print(e, color=mutils.Color.red)
             exit(1)
 
-        print(
-            "building {} samples with {} workers".format(
-                mutils.format(len(samples), style=mutils.Style.bold),
-                mutils.format(options["workers"], style=mutils.Style.bold),
-            )
+        results = dataset.generate(
+            blueprint, samples, load, transforms, output, options["workers"]
         )
-
-        arguments = [
-            (
-                blueprint,
-                sample,
-                transforms,
-                options.get("load"),
-                output,
-            )
-            for sample in samples
-        ]
-
-        if options["workers"] == 1:
-            results = [process(*a) for a in arguments]
-        else:
-            with multiprocessing.Pool(options["workers"]) as pool:
-                results = pool.starmap(process, arguments)
 
         results = [r for r in results if r]
         if "maximum_samples" in options:
