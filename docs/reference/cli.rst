@@ -7,5 +7,7 @@ CLI Commands
     :no-members:
 .. autoclass:: helix.management.commands.build.Command
     :no-members:
+.. autoclass:: helix.management.commands.datasetsimilarity.Command
+    :no-members:
 .. autoclass:: helix.management.commands.test.Command
     :no-members:

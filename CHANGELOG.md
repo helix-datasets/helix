@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Component `Loader` interface which allows downstream libraries to implement
   their own Component save/load functionality.
 - Support for Component `Loader` interface to CLI commands.
+- `dataset-similarity` CLI command for generating program similarity datasets.
 
 ### Fixed
 - Correct documentation for `verbose_name` - property not optional.

@@ -7,5 +7,6 @@ HELIX Documentation
 
     tutorial/index
     usage/index
+    extensions.rst
     reference/index
     about/index
