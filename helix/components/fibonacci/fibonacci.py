@@ -1,5 +1,5 @@
-from helix import component
-from helix import utils
+from ... import component
+from ... import utils
 
 
 class FibonacciComponent(component.Component):
