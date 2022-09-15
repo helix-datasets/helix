@@ -1,4 +1,5 @@
 import os
+import json
 import magic
 import shutil
 
@@ -25,9 +26,9 @@ class TigressTransform(transform.Transform):
 
     name = "tigress"
     verbose_name = "Tigress"
-    type = transform.Transform.TYPE_SOURCE
-    version = "1.0.0"
     description = "The Tigress Diversifier/Obfuscator."
+    version = "1.0.0"
+    type = transform.Transform.TYPE_SOURCE
 
     dependencies = [
         TigressDependency(
@@ -36,12 +37,10 @@ class TigressTransform(transform.Transform):
         )
     ]
 
-    """Configuration options."""
     options = {
-        "env": {"default": "x86_64:Linux:Gcc:4.6"},
-        "transform": {"default": "Flatten"},
-        "functions": {"default": "-"},
-        "flags": {"default": ""},
+        "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
+        "Seed": {"default": "42"},
+        "Recipe": {"default": "recipe.json"},
     }
 
     def supported(self, source):
@@ -58,6 +57,19 @@ class TigressTransform(transform.Transform):
         else:
             return False
 
+    def parse_json(self, recipe):
+        f = open(recipe)
+        data = json.load(f)
+
+        recipe = ""
+
+        for transform in data.keys():
+            recipe += " --Transform=" + transform
+            for option in data[transform].keys():
+                recipe += " --" + option + "=" + data[transform][option]
+
+        return recipe
+
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""
 
@@ -69,53 +81,19 @@ class TigressTransform(transform.Transform):
 
         cwd, _ = os.path.split(source)
 
-        # Checks if functions were provided, if not it defaults to all the functions in the src.
-        if self.configuration["functions"] != "-":
-            functions = self.configuration["functions"].replace("/", ",")
-        else:
-            extract_f = core_extractor.extractor(
-                os.path.split(source)[0], exclude=r"*.cpp*"
-            )
-            f_names = [
-                name.replace(source + "_", "") for name in extract_f["Uniq ID"].values
-            ]
-            functions = ",".join(f_names)
+        try:
+            recipe = self.parse_json(self.configuration["Recipe"])
+        except:
+            print("Failed to open recipe; using default transform (Flatten).")
+            recipe = " --Transform=Flatten --Functions=main"  # supposes there's a main function
 
-        cmd = "{} --Environment={} --Transform={} --Functions={} --out=result.c {}".format(
+        cmd = "{} --Environment={} --Seed={}{} --out=result.c {}".format(
             tigress,
-            self.configuration["env"],
-            self.configuration["transform"],
-            functions,
+            self.configuration["Environment"],
+            self.configuration["Seed"],
+            recipe,
             source,
         )
-
-        # transforms = ""
-        # if "/" in self.configuration["transforms"]:
-        #     config = self.configuration["transforms"].split("/")
-        #     for c in config:
-        #         transforms += " --Transform=" + c
-        # else:
-        #     transforms += " --Transform=" + self.configuration["transforms"]
-
-        # cmd = "{} --Environment={} {} --Functions={} --out=result.c {}".format(
-        #     tigress,
-        #     self.configuration["env"],
-        #     transforms,
-        #     functions,
-        #     source,
-        # )
-
-        if "/" in self.configuration["flags"]:
-            config = self.configuration["flags"].split("/")
-            for c in config:
-                cmd += " --" + c.split(":")[0] + "=" + c.split(":")[1]
-        elif self.configuration["flags"]:
-            cmd += (
-                " --"
-                + self.configuration["flags"].split(":")[0]
-                + "="
-                + self.configuration["flags"].split(":")[1]
-            )
 
         print("COMMAND: {}".format(cmd))
 
@@ -144,3 +122,33 @@ class TigressTransform(transform.Transform):
         # DRAFT: Command wihout much configuration.
         # cmd = "{} --Environment=x86_64:Linux:Gcc:4.6 --Transform=Flatten
         # --Functions=fac,fib --out=result.c {}".format(tigress1, source)
+
+
+# OLD CODE
+# options = {
+#     "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
+#     "Seed": {"default": "42"},
+#     "Configuration": {
+#         "default": "Transform:Flatten_FlattenDispatch:goto_Functions:main"
+#     },
+# }
+
+# options = {s
+#     "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
+#     "Seed": {"default": "42"},
+#     "Configuration": {
+#         "default": "Transform:InitEntropy_Functions:main_InitEntropyKinds:vars_Transform:InitOpaque_Functions:main_InitOpaqueStructs:list,array,env_Transform:InitBranchFuns_InitBranchFunsCount:1_Transform:AddOpaque_Functions:main_AddOpaqueStructs:list_AddOpaqueKinds=true_Transform:AntiBranchAnalysis_Functions:main_Transform:EncodeArithmetic_Functions:main"
+#     },
+# }
+
+# Checks if functions were provided, if not it defaults to all the functions in the src.
+# if self.configuration["functions"] != "-":
+#     functions = self.configuration["functions"].replace("/", ",")
+# else:
+#     extract_f = core_extractor.extractor(
+#         os.path.split(source)[0], exclude=r"*.cpp*"
+#     )
+#     f_names = [
+#         name.replace(source + "_", "") for name in extract_f["Uniq ID"].values
+#     ]
+#     functions = ",".join(f_names)
