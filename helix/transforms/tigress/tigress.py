@@ -5,7 +5,8 @@ import shutil
 
 from helix import utils
 from helix import transform
-from functiondefextractor import core_extractor
+
+# from functiondefextractor import core_extractor
 
 
 class TigressError(Exception):
@@ -17,7 +18,6 @@ class TigressDependency(utils.ManualPATHDependency):
     variables are set."""
 
     def installed(self):
-        binary = utils.find(self.name)
         return super().installed() and os.getenv("TIGRESS_HOME") is not None
 
 

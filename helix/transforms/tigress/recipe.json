@@ -1,0 +1,27 @@
+{
+	"InitEntropy": {
+		"Functions": "main",
+		"InitEntropyKinds": "vars"
+	},
+	"InitOpaque": {
+		"Functions": "main",
+		"InitOpaqueStructs": "list,array,env"
+	},
+	"InitBranchFuns": {
+		"InitBranchFunsCount": "1"
+	},
+	"AddOpaque": {
+		"Functions": "main",
+		"AddOpaqueStructs": "list",
+		"AddOpaqueKinds": "true"
+	},
+	"AntiBranchAnalysis": {
+		"Functions": "main",
+		"AntiBranchAnalysisKinds": "branchFuns",
+		"AntiBranchAnalysisObfuscateBranchFunCall": "false",
+		"AntiBranchAnalysisBranchFunFlatten": "true"
+	},
+	"EncodeArithmetic": {
+		"Functions": "main"
+	}
+}
