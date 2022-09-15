@@ -4,7 +4,7 @@ from ... import tests
 
 
 class FibonacciComponent(component.Component):
-    """Tigress Test Fibonacci component."""
+    """Fibonacci component."""
 
     name = "fibonacci"
     verbose_name = "Fibonacci Component"
