@@ -99,6 +99,7 @@ setup(
         ],
         "helix.tests": [
             "minimal-example = helix.components.examples.minimal.minimal:MinimalExampleComponentTests [testing]",
+            "fibonacci = helix.components.fibonacci.fibonacci:FibonacciComponentTests [testing]",
             "replace-example = helix.transforms.examples.replace.replace:ReplaceExampleTransformTests [testing]",
             "upx = helix.transforms.upx.tests:UPXTests [testing]",
         ],
