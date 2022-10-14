@@ -1,27 +1,17 @@
 {
-	"InitEntropy": {
-		"Functions": "main",
-		"InitEntropyKinds": "vars"
-	},
-	"InitOpaque": {
-		"Functions": "main",
-		"InitOpaqueStructs": "list,array,env"
-	},
-	"InitBranchFuns": {
-		"InitBranchFunsCount": "1"
-	},
-	"AddOpaque": {
-		"Functions": "main",
-		"AddOpaqueStructs": "list",
-		"AddOpaqueKinds": "true"
-	},
-	"AntiBranchAnalysis": {
-		"Functions": "main",
-		"AntiBranchAnalysisKinds": "branchFuns",
-		"AntiBranchAnalysisObfuscateBranchFunCall": "false",
-		"AntiBranchAnalysisBranchFunFlatten": "true"
-	},
-	"EncodeArithmetic": {
-		"Functions": "main"
-	}
+    "Seed": "42",
+    "Statistics": "0",
+    "Environment": "x86_64:Linux:Gcc:4.6",
+    "Transform": {
+        "InitEntropy": {"InitEntropyKinds": "vars"},
+        "InitOpaque": {"InitOpaqueStructs": "list,array,env"},
+        "InitBranchFuns": {"InitBranchFunsCount": "1"},
+        "AddOpaque": {"AddOpaqueStructs": "list", "AddOpaqueKinds": "true"},
+        "AntiBranchAnalysis": {
+            "AntiBranchAnalysisKinds": "branchFuns",
+            "AntiBranchAnalysisObfuscateBranchFunCall": "false",
+            "AntiBranchAnalysisBranchFunFlatten": "true",
+        },
+        "EncodeArithmetic": {},
+    },
 }

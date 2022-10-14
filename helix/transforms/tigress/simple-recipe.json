@@ -1,0 +1,6 @@
+{
+    "Seed": "42",
+    "Statistics": "0",
+    "Environment": "x86_64:Linux:Gcc:4.6",
+    "Transform": {"Flatten": {}},
+}
