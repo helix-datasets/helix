@@ -26,7 +26,7 @@ class TigressTransform(transform.Transform):
 
     name = "tigress"
     verbose_name = "Tigress"
-    description = "The Tigress Diversifier/Obfuscator."
+    description = "The Tigress Diversifier/Obfuscator (v3.3.2)."
     version = "1.0.0"
     type = transform.Transform.TYPE_SOURCE
 
@@ -90,7 +90,9 @@ class TigressTransform(transform.Transform):
 
         tigress = utils.find("tigress")
 
-        source_code = utils.source(__name__, source)
+        with open(source, "r") as f:
+            source_code = f.read()
+
         source = os.path.abspath(source)
         destination = os.path.abspath(destination)
         cwd, _ = os.path.split(source)
@@ -107,9 +109,10 @@ class TigressTransform(transform.Transform):
                 TigressError("Tigress failed to run with command:\n{}".format(cmd)),
             )
 
-            obfuscated = os.path.split(source)[0] + "/result.c"
-
+            obfuscated = cwd + "/result.c"
+            os.remove(source)
             os.rename(obfuscated, source)
+
         else:
             print("> Resulting artifact is not obfuscated by Tigress.\n")
 

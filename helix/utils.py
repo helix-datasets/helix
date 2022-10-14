@@ -668,10 +668,10 @@ def extract_fnames(src):
         //.*\n?                     : matches code formatted as single-line comments
         /*.*?*//n?                  : matches code formatted as multi-line comments
         char|signed char|...        : matches return types
-         ?(?:* )? ?                 : considers functions returning pointers
+        ( |\n)(*)( |\n)             : considers functions returning pointers
         [a-zA-Z_]+[a-zA-Z0-9_]*     : matches the function name
          ?                          : matches 0 or 1 whitespace
-        (.*?)                       : matches parameters inside parentheses
+        ([^;]*?)                    : matches parameters inside parentheses
          ?                          : matches 0 or 1 whitespace
         ?:{|\n{                     : matches the start of the body of the function definition
     """
@@ -685,7 +685,11 @@ def extract_fnames(src):
     src = re.sub(regex_singleline, "", src)
     src = re.sub(regex_multiline, "", src)
 
-    pattern = r"""(?:char|signed char|unsigned char|short|short int|signed short|signed short int|unsigned short|unsigned short int|int|signed|signed int|unsigned|unsigned int|long|long int|signed long|signed long int|unsigned long|unsigned long int|long long|long long int|signed long long|signed long long int|unsigned long long|unsigned long long int|float|double|long double|void) ?(?:\*)? ?([a-zA-Z_]+[a-zA-Z0-9_]*) ?(?:\(.*?\)) ?(?:{|\n{)"""
+    pattern = r"""(?:char|signed char|unsigned char|short|short int|signed short|signed short int|
+    unsigned short|unsigned short int|int|signed|signed int|unsigned|unsigned int|long|long int|
+    signed long|signed long int|unsigned long|unsigned long int|long long|long long int|
+    signed long long|signed long long int|unsigned long long|unsigned long long int|float|double|
+    long double|void|bool)(?: |\n)(?:\*)?(?: |\n)?([a-zA-Z_]+\w*) ?(?:\([^;]*?\)) ?(?:\{|\n\{)"""
     return re.findall(pattern, src)
 
 

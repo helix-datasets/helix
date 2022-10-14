@@ -95,7 +95,7 @@ setup(
             "strip = helix.transforms.strip.strip:StripTransform [linux]",
             "upx = helix.transforms.upx.upx:UPXTransform",
             "mpress = helix.transforms.mpress.mpress:MPRESSTransform [windows]",
-            "tigress = helix.transforms.tigress.tigress:TigressTransform",
+            "tigress = helix.transforms.tigress.tigress:TigressTransform [linux]",
         ],
         "helix.tests": [
             "minimal-example = helix.components.examples.minimal.minimal:MinimalExampleComponentTests [testing]",

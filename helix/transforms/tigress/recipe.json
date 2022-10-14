@@ -10,8 +10,8 @@
         "AntiBranchAnalysis": {
             "AntiBranchAnalysisKinds": "branchFuns",
             "AntiBranchAnalysisObfuscateBranchFunCall": "false",
-            "AntiBranchAnalysisBranchFunFlatten": "true",
+            "AntiBranchAnalysisBranchFunFlatten": "true"
         },
-        "EncodeArithmetic": {},
-    },
+        "EncodeArithmetic": {}
+    }
 }
