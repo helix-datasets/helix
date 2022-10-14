@@ -655,33 +655,6 @@ def source(package, resource):
     return content
 
 
-def remove_comments(src):
-    """Removes comments from C source code by matching patterns of regular expressions.
-
-    Args:
-        src (str): C source code as a string.
-
-    Returns:
-        The C source code without comments.
-
-    RegEx patterns explained:
-        //.*\n            : matches single-line comments
-        ?!".*//[^\"]\"\n  : excludes strings that look like single-line comments
-        /*[^/*]**/\n      : matches multi-line comments
-        ?!\"/*.**/\"\n?   : excludes strings that look like multi-line comments
-    """
-
-    multiline_pattern = r"(\/\*[^\/\*]*\*\/\n)(?!\"\/\*.*\*\/\"\n?)"
-    singleline_pattern = r"(\/\/.*\n)(?!\".*\/\/[^\"]\"\n)"
-
-    regex_multiline = re.compile(multiline_pattern, re.DOTALL | re.MULTILINE)
-    regex_singleline = re.compile(singleline_pattern)
-
-    src = re.sub(regex_multiline, "\n", src)
-    src = re.sub(regex_singleline, "\n", src)
-    return src
-
-
 def extract_fnames(src):
     """Extracts function names out of function definitions on C source code.
 
@@ -692,7 +665,9 @@ def extract_fnames(src):
         List of function names.
 
     RegEx patterns explained:
-        bool|char|...               : matches return types
+        //.*\n?                     : matches code formatted as single-line comments
+        /*.*?*//n?                  : matches code formatted as multi-line comments
+        char|signed char|...        : matches return types
          ?(?:* )? ?                 : considers functions returning pointers
         [a-zA-Z_]+[a-zA-Z0-9_]*     : matches the function name
          ?                          : matches 0 or 1 whitespace
@@ -701,9 +676,16 @@ def extract_fnames(src):
         ?:{|\n{                     : matches the start of the body of the function definition
     """
 
-    src = remove_comments(src)
+    single_pattern = r"\/\/.*\n?"
+    multiline_pattern = r"\/\*.*?\*\/\n?"
 
-    pattern = r"""(?:char|signed char|unsigned char|short|short int|signed short|signed short int|unsigned short|unsigned short int|int|signed|signed int|unsigned|unsigned int|long|long int|signed long|signed long int|unsigned long|unsigned long int|long long|long long int|signed long long|signed long long int|unsigned long long|unsigned long long int|float|double|long double) ?(?:\*)? ?([a-zA-Z_]+[a-zA-Z0-9_]*) ?(?:\(.*?\)) ?(?:{|\n{)"""
+    regex_single = re.compile(single_pattern)
+    regex_multiline = re.compile(multiline_pattern, re.DOTALL)
+
+    src = re.sub(single_pattern, "", src)
+    src = re.sub(regex_multiline, "", src)
+
+    pattern = r"""(?:char|signed char|unsigned char|short|short int|signed short|signed short int|unsigned short|unsigned short int|int|signed|signed int|unsigned|unsigned int|long|long int|signed long|signed long int|unsigned long|unsigned long int|long long|long long int|signed long long|signed long long int|unsigned long long|unsigned long long int|float|double|long double|void) ?(?:\*)? ?([a-zA-Z_]+[a-zA-Z0-9_]*) ?(?:\(.*?\)) ?(?:{|\n{)"""
     return re.findall(pattern, src)
 
 
