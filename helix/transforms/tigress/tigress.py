@@ -1,12 +1,12 @@
-import os
 import json
 import magic
+import os
 import shutil
 
-from helix import utils
-from helix import transform
+from json.decoder import JSONDecodeError
 
-# from functiondefextractor import core_extractor
+from ... import utils
+from ... import transform
 
 
 class TigressError(Exception):
@@ -38,9 +38,7 @@ class TigressTransform(transform.Transform):
     ]
 
     options = {
-        "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
-        "Seed": {"default": "42"},
-        "Recipe": {"default": "recipe.json"},
+        "Recipe": {"default": "simple-recipe.json"},
     }
 
     def supported(self, source):
@@ -57,98 +55,62 @@ class TigressTransform(transform.Transform):
         else:
             return False
 
-    def parse_json(self, recipe):
-        f = open(recipe)
-        data = json.load(f)
+    def parse_json(self, recipe, fnames):
+        try:
+            f = open(recipe, "r")
+            print("> Found JSON file.")
+            try:
+                data = json.load(f)
+                print("> Loaded JSON file data.")
+            except JSONDecodeError:
+                f.close()
+                print("> Could not load JSON file.")
+                return False
 
-        recipe = ""
+            recipe = ""
 
-        for transform in data.keys():
-            recipe += " --Transform=" + transform
-            for option in data[transform].keys():
-                recipe += " --" + option + "=" + data[transform][option]
+            for key in data.keys():
+                if key == "Transform":
+                    for t in data[key]:
+                        recipe += " --Transform=" + t
+                        for option in data[key][t]:
+                            recipe += " --" + option + "=" + data[key][t][option]
+                        recipe += " --Functions=" + ",".join(fnames)
+                else:
+                    recipe += " --" + key + "=" + data[key]
+            f.close()
+            return recipe
 
-        return recipe
+        except FileNotFoundError:
+            print("> JSON file not found.")
+            return False
 
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""
 
         tigress = utils.find("tigress")
 
+        source_code = utils.source(__name__, source)
         source = os.path.abspath(source)
-
         destination = os.path.abspath(destination)
-
         cwd, _ = os.path.split(source)
+        fnames = utils.extract_fnames(source_code)
 
-        try:
-            recipe = self.parse_json(self.configuration["Recipe"])
-        except:
-            print("Failed to open recipe; using default transform (Flatten).")
-            recipe = " --Transform=Flatten --Functions=main"  # supposes there's a main function
+        recipe = self.parse_json(self.configuration["Recipe"], fnames)
 
-        cmd = "{} --Environment={} --Seed={}{} --out=result.c {}".format(
-            tigress,
-            self.configuration["Environment"],
-            self.configuration["Seed"],
-            recipe,
-            source,
-        )
+        if recipe:
+            cmd = "{}{} --out=result.c {}".format(tigress, recipe, source)
 
-        print("COMMAND: {}".format(cmd))
+            utils.run(
+                cmd,
+                cwd,
+                TigressError("Tigress failed to run with command:\n{}".format(cmd)),
+            )
 
-        utils.run(cmd, cwd, TigressError("tigress failed to run."))
+            obfuscated = os.path.split(source)[0] + "/result.c"
 
-        obfuscated = os.path.split(source)[0] + "/result.c"
+            os.rename(obfuscated, source)
+        else:
+            print("> Resulting artifact is not obfuscated by Tigress.\n")
 
-        os.rename(obfuscated, source)
         shutil.copy(source, destination)
-
-        # DEBUG: Prints the full command being run.
-        # print("COMMAND: {}".format(cmd))
-
-        # DEBUG: Prints the current working directory.
-        # print("CWD: {}".format(cwd))
-
-        # DEBUG: Prints the source path.
-        # print("SOURCE: {}".format(source))
-
-        # DEBUG: Prints the path of the obfuscated code.
-        # print("OBFUSCATED PATH: {}".format(obfuscated))
-
-        # DEBUG: Prints the path where the obfuscated code is being copied to.
-        # print("DESTINATION: {}".format(destination))
-
-        # DRAFT: Command wihout much configuration.
-        # cmd = "{} --Environment=x86_64:Linux:Gcc:4.6 --Transform=Flatten
-        # --Functions=fac,fib --out=result.c {}".format(tigress1, source)
-
-
-# OLD CODE
-# options = {
-#     "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
-#     "Seed": {"default": "42"},
-#     "Configuration": {
-#         "default": "Transform:Flatten_FlattenDispatch:goto_Functions:main"
-#     },
-# }
-
-# options = {s
-#     "Environment": {"default": "x86_64:Linux:Gcc:4.6"},
-#     "Seed": {"default": "42"},
-#     "Configuration": {
-#         "default": "Transform:InitEntropy_Functions:main_InitEntropyKinds:vars_Transform:InitOpaque_Functions:main_InitOpaqueStructs:list,array,env_Transform:InitBranchFuns_InitBranchFunsCount:1_Transform:AddOpaque_Functions:main_AddOpaqueStructs:list_AddOpaqueKinds=true_Transform:AntiBranchAnalysis_Functions:main_Transform:EncodeArithmetic_Functions:main"
-#     },
-# }
-
-# Checks if functions were provided, if not it defaults to all the functions in the src.
-# if self.configuration["functions"] != "-":
-#     functions = self.configuration["functions"].replace("/", ",")
-# else:
-#     extract_f = core_extractor.extractor(
-#         os.path.split(source)[0], exclude=r"*.cpp*"
-#     )
-#     f_names = [
-#         name.replace(source + "_", "") for name in extract_f["Uniq ID"].values
-#     ]
-#     functions = ",".join(f_names)
