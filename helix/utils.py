@@ -676,13 +676,13 @@ def extract_fnames(src):
         ?:{|\n{                     : matches the start of the body of the function definition
     """
 
-    single_pattern = r"\/\/.*\n?"
+    singleline_pattern = r"\/\/.*\n?"
     multiline_pattern = r"\/\*.*?\*\/\n?"
 
-    regex_single = re.compile(single_pattern)
+    regex_singleline = re.compile(singleline_pattern)
     regex_multiline = re.compile(multiline_pattern, re.DOTALL)
 
-    src = re.sub(single_pattern, "", src)
+    src = re.sub(regex_singleline, "", src)
     src = re.sub(regex_multiline, "", src)
 
     pattern = r"""(?:char|signed char|unsigned char|short|short int|signed short|signed short int|unsigned short|unsigned short int|int|signed|signed int|unsigned|unsigned int|long|long int|signed long|signed long int|unsigned long|unsigned long int|long long|long long int|signed long long|signed long long int|unsigned long long|unsigned long long int|float|double|long double|void) ?(?:\*)? ?([a-zA-Z_]+[a-zA-Z0-9_]*) ?(?:\(.*?\)) ?(?:{|\n{)"""
