@@ -41,17 +41,20 @@ class TigressDependency(utils.Dependency):
         }
         data = parse.urlencode(data).encode()
         request = req.Request(url=url, data=data)
+        print("  -> downloading")
         response = req.urlopen(request)
 
         temp = os.path.expanduser("~/Downloads/tigress-3.1-bin.zip")
         destination = os.path.expanduser("~/Downloads")
 
         open(temp, "wb").write(response.read())
+        print("  -> unpacking")
         shutil.unpack_archive(temp, destination)
         os.remove(temp)
 
+        print("  -> adding execution permission")
         exec_permission = "chmod -R u+x " + destination + "/tigress"
-        utils.run(exec_permission)
+        utils.run(exec_permission, propagate=True)
 
     def installed(self):
         """Checks if Tigress is installed by guessing the path to the binary."""
