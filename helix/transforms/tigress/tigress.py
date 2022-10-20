@@ -2,23 +2,64 @@ import json
 import magic
 import os
 import shutil
+from urllib import parse, request as req
 
 from json.decoder import JSONDecodeError
 
 from ... import utils
 from ... import transform
+from ... import exceptions
 
 
 class TigressError(Exception):
     """Raised when Tigress fails."""
 
+    pass
 
-class TigressDependency(utils.ManualPATHDependency):
-    """Checks if Tigress is installed and both (PATH and TIGRESS_HOME) environment
-    variables are set."""
+
+class TigressDependency(utils.Dependency):
+    """Using the Tigress Transform"""
+
+    def __init__(self, name):
+        if os.name != "posix":
+            raise exceptions.ConfigurationError(
+                "unsupported platform for this dependency type: {}".format(os.name)
+            )
+
+            self.name = name
+
+    def install(self, verbose):
+        """Downloading Tigress binaries and adding execution permission."""
+        print("  By installing, you accept the Tigress End-User License Agreement.")
+        url = "http://tigress.cs.arizona.edu/cgi-bin/projects/tigress/download.cgi"
+        data = {
+            "accept": "Accept and Download",
+            "mode": "download",
+            "buffer": "address:----email:----file:tigress-3.1-bin.zip----name:----remote_addr=----timestamp:----",
+            "file": "tigress-3.1-bin.zip",
+            "destfile": "tigress-3.1-bin.zip",
+        }
+        data = parse.urlencode(data).encode()
+        request = req.Request(url=url, data=data)
+        response = req.urlopen(request)
+
+        temp = os.path.expanduser("~/Downloads/tigress-3.1-bin.zip")
+        destination = os.path.expanduser("~/Downloads")
+
+        open(temp, "wb").write(response.read())
+        shutil.unpack_archive(temp, destination)
+        os.remove(temp)
+
+        exec_permission = "chmod -R u+x " + destination + "/tigress"
+        utils.run(exec_permission)
 
     def installed(self):
-        return super().installed() and os.getenv("TIGRESS_HOME") is not None
+        """Checks if Tigress is installed by guessing the path to the binary."""
+        binary = utils.find(
+            "tigress", guess=[os.path.expanduser("~/Downloads/tigress/3.1/tigress")]
+        )
+
+        return binary is not None
 
 
 class TigressTransform(transform.Transform):
@@ -26,16 +67,11 @@ class TigressTransform(transform.Transform):
 
     name = "tigress"
     verbose_name = "Tigress"
-    description = "The Tigress Diversifier/Obfuscator (v3.3.2)."
+    description = "The Tigress Diversifier/Obfuscator (v3.1)."
     version = "1.0.0"
     type = transform.Transform.TYPE_SOURCE
 
-    dependencies = [
-        TigressDependency(
-            name="tigress",
-            help="[remember to set the TIGRESS_HOME and PATH environment variables]",
-        )
-    ]
+    dependencies = [TigressDependency("tigress")]
 
     options = {
         "Recipe": {"default": "simple-recipe.json"},
@@ -88,7 +124,9 @@ class TigressTransform(transform.Transform):
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""
 
-        tigress = utils.find("tigress")
+        tigress = utils.find(
+            "tigress", guess=[os.path.expanduser("~/Downloads/tigress/3.1/tigress")]
+        )
 
         with open(source, "r") as f:
             source_code = f.read()
@@ -101,12 +139,17 @@ class TigressTransform(transform.Transform):
         recipe = self.parse_json(self.configuration["Recipe"], fnames)
 
         if recipe:
+            env = os.environ
+            env["TIGRESS_HOME"] = os.path.expanduser("~/Downloads/tigress/3.1")
+            env["PATH"] = os.path.expanduser("~/Downloads/tigress/3.1:") + env["PATH"]
+
             cmd = "{}{} --out=result.c {}".format(tigress, recipe, source)
 
             utils.run(
                 cmd,
                 cwd,
                 TigressError("Tigress failed to run with command:\n{}".format(cmd)),
+                env=env,
             )
 
             obfuscated = cwd + "/result.c"
