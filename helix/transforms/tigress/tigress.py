@@ -41,7 +41,6 @@ class TigressDependency(utils.Dependency):
         }
         data = parse.urlencode(data).encode()
         request = req.Request(url=url, data=data)
-        print("  -> downloading")
         response = req.urlopen(request)
 
         destination = os.path.expanduser("~/bin")
@@ -51,11 +50,9 @@ class TigressDependency(utils.Dependency):
         temp = destination + "/tigress-3.1-bin.zip"
 
         open(temp, "wb").write(response.read())
-        print("  -> unpacking")
         shutil.unpack_archive(temp, destination)
         os.remove(temp)
 
-        print("  -> adding execution permission")
         exec_permission = "chmod -R u+x " + destination + "/tigress"
         utils.run(exec_permission, propagate=True)
 
