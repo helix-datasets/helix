@@ -44,8 +44,11 @@ class TigressDependency(utils.Dependency):
         print("  -> downloading")
         response = req.urlopen(request)
 
-        temp = os.path.expanduser("~/Downloads/tigress-3.1-bin.zip")
-        destination = os.path.expanduser("~/Downloads")
+        destination = os.path.expanduser("~/bin")
+        if not os.path.exists(destination):
+            os.makedirs(destination)
+
+        temp = destination + "/tigress-3.1-bin.zip"
 
         open(temp, "wb").write(response.read())
         print("  -> unpacking")
@@ -59,7 +62,7 @@ class TigressDependency(utils.Dependency):
     def installed(self):
         """Checks if Tigress is installed by guessing the path to the binary."""
         binary = utils.find(
-            "tigress", guess=[os.path.expanduser("~/Downloads/tigress/3.1/tigress")]
+            "tigress", guess=[os.path.expanduser("~/bin/tigress/3.1/tigress")]
         )
 
         return binary is not None
@@ -128,7 +131,7 @@ class TigressTransform(transform.Transform):
         """Obfuscate functions on a target source code."""
 
         tigress = utils.find(
-            "tigress", guess=[os.path.expanduser("~/Downloads/tigress/3.1/tigress")]
+            "tigress", guess=[os.path.expanduser("~/bin/tigress/3.1/tigress")]
         )
 
         with open(source, "r") as f:
@@ -143,8 +146,8 @@ class TigressTransform(transform.Transform):
 
         if recipe:
             env = os.environ
-            env["TIGRESS_HOME"] = os.path.expanduser("~/Downloads/tigress/3.1")
-            env["PATH"] = os.path.expanduser("~/Downloads/tigress/3.1:") + env["PATH"]
+            env["TIGRESS_HOME"] = os.path.expanduser("~/bin/tigress/3.1")
+            env["PATH"] = os.path.expanduser("~/bin/tigress/3.1:") + env["PATH"]
 
             cmd = "{}{} --out=result.c {}".format(tigress, recipe, source)
 
