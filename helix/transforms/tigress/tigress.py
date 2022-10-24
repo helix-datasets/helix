@@ -153,6 +153,7 @@ class TigressTransform(transform.Transform):
                 cwd,
                 TigressError("Tigress failed to run with command:\n{}".format(cmd)),
                 env=env,
+                propagate=True,
             )
 
             obfuscated = cwd + "/result.c"
