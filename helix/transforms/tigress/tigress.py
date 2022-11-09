@@ -1,14 +1,19 @@
 import json
+import logging
 import magic
 import os
 import shutil
-from urllib import parse, request as req
 
 from json.decoder import JSONDecodeError
+from urllib import parse, request as req
+from .utils import CustomZipFile, extract_fnames
 
-from ... import utils
-from ... import transform
 from ... import exceptions
+from ... import transform
+from ... import utils
+
+
+logger = logging.getLogger("transform.tigress")
 
 
 class TigressError(Exception):
@@ -26,11 +31,12 @@ class TigressDependency(utils.Dependency):
                 "unsupported platform for this dependency type: {}".format(os.name)
             )
 
-            self.name = name
+        self.name = name
 
     def install(self, verbose):
         """Downloading Tigress binaries and adding execution permission."""
-        print("  By installing, you accept the Tigress End-User License Agreement.")
+        logger.info("By installing, you accept the Tigress End-User License Agreement.")
+
         url = "http://tigress.cs.arizona.edu/cgi-bin/projects/tigress/download.cgi"
         data = {
             "accept": "Accept and Download",
@@ -50,11 +56,10 @@ class TigressDependency(utils.Dependency):
         temp = destination + "/tigress-3.1-bin.zip"
 
         open(temp, "wb").write(response.read())
-        shutil.unpack_archive(temp, destination)
-        os.remove(temp)
+        with CustomZipFile(temp, "r") as z:
+            z.extractall(destination)
 
-        exec_permission = "chmod -R u+x " + destination + "/tigress"
-        utils.run(exec_permission, propagate=True)
+        os.remove(temp)
 
     def installed(self):
         """Checks if Tigress is installed by guessing the path to the binary."""
@@ -70,40 +75,37 @@ class TigressTransform(transform.Transform):
 
     name = "tigress"
     verbose_name = "Tigress"
-    description = "The Tigress Diversifier/Obfuscator (v3.1)."
+    description = "The Tigress Diversifier/Obfuscator (v3.1)"
     version = "1.0.0"
     type = transform.Transform.TYPE_SOURCE
 
     dependencies = [TigressDependency("tigress")]
 
     options = {
-        "Recipe": {"default": "simple-recipe.json"},
+        "recipe": {"default": "simple-recipe.json"},
     }
 
     def supported(self, source):
         """Checks if Tigress supports the given file.
 
-        Verifies that the target file has a .c file extension.
+        Verifies that the source code file is written in C programming language.
         """
 
         m = magic.Magic()
         filetype = m.id_filename(source)
 
-        if "C source" in filetype:
-            return True
-        else:
-            return False
+        return "C source" in filetype
 
     def parse_json(self, recipe, fnames):
         try:
             f = open(recipe, "r")
-            print("> Found JSON file.")
+            logger.info("Found JSON file.")
             try:
                 data = json.load(f)
-                print("> Loaded JSON file data.")
+                logger.info("Loaded JSON file data.")
             except JSONDecodeError:
                 f.close()
-                print("> Could not load JSON file.")
+                logger.error("Could not load JSON file.")
                 return False
 
             recipe = ""
@@ -121,7 +123,7 @@ class TigressTransform(transform.Transform):
             return recipe
 
         except FileNotFoundError:
-            print("> JSON file not found.")
+            logger.error("JSON file not found.")
             return False
 
     def transform(self, source, destination):
@@ -137,9 +139,9 @@ class TigressTransform(transform.Transform):
         source = os.path.abspath(source)
         destination = os.path.abspath(destination)
         cwd, _ = os.path.split(source)
-        fnames = utils.extract_fnames(source_code)
+        fnames = extract_fnames(source_code)
 
-        recipe = self.parse_json(self.configuration["Recipe"], fnames)
+        recipe = self.parse_json(self.configuration["recipe"], fnames)
 
         if recipe:
             env = os.environ
@@ -161,6 +163,6 @@ class TigressTransform(transform.Transform):
             os.rename(obfuscated, source)
 
         else:
-            print("> Resulting artifact is not obfuscated by Tigress.\n")
+            logger.warning("Resulting artifact is not obfuscated by Tigress.\n")
 
         shutil.copy(source, destination)
