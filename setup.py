@@ -102,6 +102,8 @@ setup(
             "fibonacci = helix.components.fibonacci.fibonacci:FibonacciComponentTests [testing]",
             "replace-example = helix.transforms.examples.replace.replace:ReplaceExampleTransformTests [testing]",
             "upx = helix.transforms.upx.tests:UPXTests [testing]",
+            "tigress-utils = helix.transforms.tigress.tests:TigressUtilityTests [testing]",
+            "tigress = helix.transforms.tigress.tests:TigressTests [testing]",
         ],
     },
 )
