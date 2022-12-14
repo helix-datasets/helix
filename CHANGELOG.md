@@ -10,9 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   their own Component save/load functionality.
 - Support for Component `Loader` interface to CLI commands.
 - `dataset-similarity` CLI command for generating program similarity datasets.
+- Added explicit support for Python 3.11.
 
 ### Fixed
 - Correct documentation for `verbose_name` - property not optional.
+
+### Removed
+- Removed explicit support for Python 3.5 (end-of-life).
+- Removed explicit support for Python 3.6 (end-of-life).
 
 ## [1.2.0] - 2022-01-18
 ### Added
