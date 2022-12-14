@@ -41,7 +41,7 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
     packages=find_packages(),
-    python_requires=">=3.5",
+    python_requires=">=3.7",
     install_requires=["filemagic"],
     extras_require={
         "development": [
