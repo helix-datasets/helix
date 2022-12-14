@@ -529,6 +529,21 @@ class UtilityTests(unittest.TestCase):
         )
         self.assertEqual(len(result["configuration"]), 3)
 
+    def test_specification_special_characters_outside_quotes(self):
+        specification = "name:one=special:character,two=special=character,three=special:character=something"
+
+        result = utils.parse(specification)
+
+        self.assertIn("one", result["configuration"].keys())
+        self.assertEqual(result["configuration"]["one"], "special:character")
+        self.assertIn("two", result["configuration"].keys())
+        self.assertEqual(result["configuration"]["two"], "special=character")
+        self.assertIn("three", result["configuration"].keys())
+        self.assertEqual(
+            result["configuration"]["three"], "special:character=something"
+        )
+        self.assertEqual(len(result["configuration"]), 3)
+
 
 class TestComponent(component.Component):
     name = "test"
