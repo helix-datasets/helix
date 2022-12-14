@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Correct documentation for `verbose_name` - property not optional.
+- Allow special characters (`=`, `:`) in quotes in CLI component parsing.
 
 ## [1.2.0] - 2022-01-18
 ### Added
