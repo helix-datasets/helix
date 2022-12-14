@@ -837,7 +837,7 @@ def parse(specification):
 
     name = name.strip('"')
 
-    configuration = dict(re.findall(r'([^,]+)=(["\'].*?["\']|[^,]+)', configuration))
+    configuration = dict(re.findall(r'([^,=]+)=(["\'].*?["\']|[^,]+)', configuration))
     configuration = {k: v.strip("\"'") for k, v in configuration.items()}
 
     return {"name": name, "configuration": configuration}
