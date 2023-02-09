@@ -1,17 +1,15 @@
-import json
+import copy
 import logging
-import magic
 import os
 import shutil
+from urllib import parse
+from urllib import request as req
 
-from json.decoder import JSONDecodeError
-from urllib import parse, request as req
-from .utils import CustomZipFile, extract_fnames
+import magic
 
-from ... import exceptions
-from ... import transform
-from ... import utils
-
+from ... import exceptions, transform, utils
+from . import utils as tigress_utils
+from .configurations import tigress_transforms
 
 logger = logging.getLogger("transform.tigress")
 
@@ -23,7 +21,7 @@ class TigressError(Exception):
 
 
 class TigressDependency(utils.Dependency):
-    """Using the Tigress Transform"""
+    """Using the Tigress Transform."""
 
     def __init__(self, name):
         if os.name != "posix":
@@ -56,7 +54,7 @@ class TigressDependency(utils.Dependency):
         temp = destination + "/tigress-3.1-bin.zip"
 
         open(temp, "wb").write(response.read())
-        with CustomZipFile(temp, "r") as z:
+        with tigress_utils.CustomZipFile(temp, "r") as z:
             z.extractall(destination)
 
         os.remove(temp)
@@ -82,7 +80,10 @@ class TigressTransform(transform.Transform):
     dependencies = [TigressDependency("tigress")]
 
     options = {
-        "recipe": {"default": "simple-recipe.json"},
+        "environment": {"default": "x86_64:Linux:Gcc:4.6"},
+        "seed": {"default": "0"},
+        "verbosity": {"default": "0"},
+        "transforms": "",
     }
 
     def supported(self, source):
@@ -96,73 +97,110 @@ class TigressTransform(transform.Transform):
 
         return "C source" in filetype
 
-    def parse_json(self, recipe, fnames):
-        try:
-            f = open(recipe, "r")
-            logger.info("Found JSON file.")
-            try:
-                data = json.load(f)
-                logger.info("Loaded JSON file data.")
-            except JSONDecodeError:
-                f.close()
-                logger.error("Could not load JSON file.")
-                return False
+    def validate_configuration(self):
+        """
+        Provides custom configuration validation.
 
-            recipe = ""
+        This method checks that at least one valid transform was provided and that both options
+        choices provided are valid. It creates a dictionary by parsing the user input that will
+        be validated by a call to the ``tigress_utils._validate()`` method. Raises a
+        ConfigurationError if any user input is invalid and logs the results.
+        """
+        invalid_transforms = list()
+        invalid_options = list()
+        invalid_choices = list()
 
-            for key in data.keys():
-                if key == "Transform":
-                    for t in data[key]:
-                        recipe += " --Transform=" + t
-                        for option in data[key][t]:
-                            recipe += " --" + option + "=" + data[key][t][option]
-                        recipe += " --Functions=" + ",".join(fnames)
-                else:
-                    recipe += " --" + key + "=" + data[key]
-            f.close()
-            return recipe
+        # Validates top_level configurations.
+        configs = {
+            k: self.configuration[k] for k in self.configuration.keys() - {"transforms"}
+        }
+        _, ic = tigress_utils._validate("top_level", configs)
+        invalid_choices.extend(ic)
 
-        except FileNotFoundError:
-            logger.error("JSON file not found.")
-            return False
+        # Parses ``transforms`` option into dict for validation.
+        parsed = tigress_utils._to_dict(self.configuration["transforms"])
+        self.configuration["transforms"] = copy.deepcopy(parsed)
+
+        # Validates user provided transforms.
+        usr_transforms = parsed.pop("transforms_lst")
+        usr_transforms.sort()
+
+        invalid_transforms = [t for t in usr_transforms if t not in tigress_transforms]
+        invalid_transforms.sort()
+
+        if usr_transforms == invalid_transforms:
+            raise exceptions.ConfigurationError("no valid transform was provided")
+
+        # Validates user provided option/choice; excluding those from the invalid transforms.
+        for obj in parsed.values():
+            transform = obj.pop("transform_name")
+            if transform not in invalid_transforms:
+                configs = {option: obj[option] for option in obj.keys()}
+                if configs:
+                    io, ic = tigress_utils._validate(transform, configs)
+                    invalid_options.extend(io)
+                    invalid_choices.extend(ic)
+
+        # If any invalid configuration was provided raises a configuration error with a log message.
+        if invalid_transforms or invalid_options or invalid_choices:
+            log = ""
+            if invalid_transforms:
+                log += "\ninvalid transforms: \n"
+                for t in invalid_transforms:
+                    log += "[x] {}\n".format(t)
+            if invalid_options:
+                log += "\ninvalid options: \n"
+                for t, s in invalid_options:
+                    log += "[x] transform:{} invalid_option={}\n".format(t, s)
+            if invalid_choices:
+                log += "\ninvalid configurations: \n"
+                for t, s, c in invalid_choices:
+                    log += "[x] transform:{} option:{} invalid_choice={}\n".format(
+                        t, s, c
+                    )
+            raise exceptions.ConfigurationError(log)
 
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""
-
-        tigress = utils.find(
-            "tigress", guess=[os.path.expanduser("~/bin/tigress/3.1/tigress")]
-        )
-
-        with open(source, "r") as f:
-            source_code = f.read()
-
         source = os.path.abspath(source)
-        destination = os.path.abspath(destination)
-        cwd, _ = os.path.split(source)
-        fnames = extract_fnames(source_code)
-
-        recipe = self.parse_json(self.configuration["recipe"], fnames)
-
-        if recipe:
-            env = os.environ
-            env["TIGRESS_HOME"] = os.path.expanduser("~/bin/tigress/3.1")
-            env["PATH"] = os.path.expanduser("~/bin/tigress/3.1:") + env["PATH"]
-
-            cmd = "{}{} --out=result.c {}".format(tigress, recipe, source)
-
-            utils.run(
-                cmd,
-                cwd,
-                TigressError("Tigress failed to run with command:\n{}".format(cmd)),
-                env=env,
-                propagate=True,
+        with open(source, "r+") as s:
+            src_code = s.read()
+            s.seek(0, 0)
+            s.write(
+                '#include "'
+                + os.path.expanduser("~/bin/tigress/3.1/tigress.h")
+                + '"\n'
+                + src_code
             )
 
-            obfuscated = cwd + "/result.c"
-            os.remove(source)
-            os.rename(obfuscated, source)
+        destination = os.path.abspath(destination)
+        cwd, _ = os.path.split(source)
 
+        cmd = tigress_utils._build_command(self.configuration, source)
+
+        env = os.environ
+        env["TIGRESS_HOME"] = os.path.expanduser("~/bin/tigress/3.1")
+        env["PATH"] = os.path.expanduser("~/bin/tigress/3.1:") + env["PATH"]
+
+        log = open(cwd + "/log.txt", "wb+")
+
+        utils.run(
+            cmd,
+            cwd,
+            TigressError("Tigress failed to run with command:\n{}".format(cmd)),
+            env=env,
+            stdout=log,
+        )
+
+        log.close()
+
+        if self.configuration["verbosity"] == "0":
+            os.remove(cwd + "/log.txt")
         else:
-            logger.warning("Resulting artifact is not obfuscated by Tigress.\n")
+            logger.info("Transformations applied logged in: {}".format(log.name))
+
+        obfuscated = cwd + "/result.c"
+        os.rename(source, cwd + "/source.c")
+        os.rename(obfuscated, source)
 
         shutil.copy(source, destination)
