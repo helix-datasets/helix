@@ -97,7 +97,7 @@ def validate(transform: str, configs: dict):
                     continue
                 except ValueError:
                     pass
-            elif format == "flag" or format == None:
+            elif format == "flag" or format is None:
                 continue
 
             # Handles invalid choice.
