@@ -13,7 +13,7 @@ string_str = "string"
 tuple_str = "tuple"
 
 
-"""argument_specification (dict): 
+"""argument_specification (dict):
 
     Dictionary that maps the string representing an argument specification to it's valid values and the format
     of those values. Said format is used by tigress.utils._validate() to determine the method that will be used
@@ -36,11 +36,11 @@ argument_specification = {
     bool_str: (("true", "false"), tuple_str),
     boolspec_str: (("?", "true", "false"), tuple_str),
     float_str: (None, float_str),
-    fracspec_str: (["\*", "[0-9]+", "[0-9]+\?[0-9]+", "%[0-9]+"], regex_str),
+    fracspec_str: ([r"\*", r"[0-9]+", r"[0-9]+\?[0-9]+", r"%[0-9]+"], regex_str),
     identspec_str: (None, None),
     inputspec_str: (None, None),
-    int_str: (["[0-9]+"], regex_str),
-    intspec_str: (["\?", "[0-9]+\?[0-9]+", "[0-9]+"], regex_str),
+    int_str: ([r"[0-9]+"], regex_str),
+    intspec_str: ([r"\?", r"[0-9]+\?[0-9]+", r"[0-9]+"], regex_str),
     localspec_str: (None, None),
     string_str: (None, None),
 }
