@@ -82,7 +82,7 @@ class TigressTransform(transform.Transform):
     options = {
         "environment": {"default": "x86_64:Linux:Gcc:4.6"},
         "seed": {"default": "0"},
-        "verbosity": {"default": "0"},
+        "file_prefix": {"default": "NONE"},
         "transforms": "",
     }
 
@@ -101,24 +101,24 @@ class TigressTransform(transform.Transform):
         """
         Provides custom configuration validation.
 
-        This method checks that at least one valid transform was provided and that both options
-        choices provided are valid. It creates a dictionary by parsing the user input that will
-        be validated by a call to the ``tigress_utils._validate()`` method. Raises a
-        ConfigurationError if any user input is invalid and logs the results.
+        This method checks that at least one valid transform was provided and that both options &
+        choices provided are valid. By parsing the user input, it creates a dictionary that will
+        be validated by a call to the ``tigress_utils.validate()`` method. Raises a ConfigurationError
+        if any user input is invalid and raises an Exception.
         """
         invalid_transforms = list()
         invalid_options = list()
         invalid_choices = list()
 
-        # Validates top_level configurations.
+        # Validates global top_level configurations.
         configs = {
             k: self.configuration[k] for k in self.configuration.keys() - {"transforms"}
         }
-        _, ic = tigress_utils._validate("top_level", configs)
+        _, ic = tigress_utils.validate("top_level", configs)
         invalid_choices.extend(ic)
 
         # Parses ``transforms`` option into dict for validation.
-        parsed = tigress_utils._to_dict(self.configuration["transforms"])
+        parsed = tigress_utils.to_dict(self.configuration["transforms"])
         self.configuration["transforms"] = copy.deepcopy(parsed)
 
         # Validates user provided transforms.
@@ -137,7 +137,7 @@ class TigressTransform(transform.Transform):
             if transform not in invalid_transforms:
                 configs = {option: obj[option] for option in obj.keys()}
                 if configs:
-                    io, ic = tigress_utils._validate(transform, configs)
+                    io, ic = tigress_utils.validate(transform, configs)
                     invalid_options.extend(io)
                     invalid_choices.extend(ic)
 
@@ -176,28 +176,19 @@ class TigressTransform(transform.Transform):
         destination = os.path.abspath(destination)
         cwd, _ = os.path.split(source)
 
-        cmd = tigress_utils._build_command(self.configuration, source)
+        cmd = tigress_utils.build_command(self.configuration, source)
 
         env = os.environ
         env["TIGRESS_HOME"] = os.path.expanduser("~/bin/tigress/3.1")
         env["PATH"] = os.path.expanduser("~/bin/tigress/3.1:") + env["PATH"]
-
-        log = open(cwd + "/log.txt", "wb+")
 
         utils.run(
             cmd,
             cwd,
             TigressError("Tigress failed to run with command:\n{}".format(cmd)),
             env=env,
-            stdout=log,
+            propagate=False,
         )
-
-        log.close()
-
-        if self.configuration["verbosity"] == "0":
-            os.remove(cwd + "/log.txt")
-        else:
-            logger.info("Transformations applied logged in: {}".format(log.name))
 
         obfuscated = cwd + "/result.c"
         os.rename(source, cwd + "/source.c")
