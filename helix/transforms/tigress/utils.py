@@ -61,7 +61,6 @@ def validate(transform: str, configs: dict):
 
         # Verifies that option is valid.
         if option in valid_options.keys():
-
             # Determines the format that will be used to validate the user choice.
             format = valid_configs[transform][option]
 
