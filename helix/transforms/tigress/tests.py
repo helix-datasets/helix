@@ -1,9 +1,8 @@
 import os
 import unittest
 
-from .utils import validate, to_dict, build_command
-from ... import exceptions
-from ... import tests
+from ... import exceptions, tests
+from .utils import build_command, to_dict, validate
 
 
 def run_option_validation(transform, option):

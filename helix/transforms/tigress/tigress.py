@@ -142,23 +142,9 @@ class TigressTransform(transform.Transform):
                     invalid_choices.extend(ic)
 
         # If any invalid configuration was provided raises a configuration error with a log message.
-        if invalid_transforms or invalid_options or invalid_choices:
-            log = ""
-            if invalid_transforms:
-                log += "\ninvalid transforms: \n"
-                for t in invalid_transforms:
-                    log += "[x] {}\n".format(t)
-            if invalid_options:
-                log += "\ninvalid options: \n"
-                for t, s in invalid_options:
-                    log += "[x] transform:{} invalid_option={}\n".format(t, s)
-            if invalid_choices:
-                log += "\ninvalid configurations: \n"
-                for t, s, c in invalid_choices:
-                    log += "[x] transform:{} option:{} invalid_choice={}\n".format(
-                        t, s, c
-                    )
-            raise exceptions.ConfigurationError(log)
+        tigress_utils.raise_config_error(
+            invalid_transforms, invalid_options, invalid_choices
+        )
 
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""
@@ -187,7 +173,6 @@ class TigressTransform(transform.Transform):
             cwd,
             TigressError("Tigress failed to run with command:\n{}".format(cmd)),
             env=env,
-            propagate=False,
         )
 
         obfuscated = cwd + "/result.c"
