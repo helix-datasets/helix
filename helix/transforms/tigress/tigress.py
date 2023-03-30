@@ -142,9 +142,10 @@ class TigressTransform(transform.Transform):
                     invalid_choices.extend(ic)
 
         # If any invalid configuration was provided raises a configuration error with a log message.
-        tigress_utils.raise_config_error(
-            invalid_transforms, invalid_options, invalid_choices
-        )
+        if invalid_transforms or invalid_options or invalid_choices:
+            tigress_utils.raise_config_error(
+                invalid_transforms, invalid_options, invalid_choices
+            )
 
     def transform(self, source, destination):
         """Obfuscate functions on a target source code."""

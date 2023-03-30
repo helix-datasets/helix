@@ -134,7 +134,7 @@ def validate(transform: str, configs: dict):
             else:
                 valid_values, format = argument_specification[format]
 
-            # Validates ``choice``.`
+            # Validates ``choice``.
             if format == "regex":
                 combined = "(" + ")|(".join(valid_values) + ")"
                 if re.fullmatch(combined, choice):
@@ -182,6 +182,7 @@ def raise_config_error(invalid_transforms, invalid_options, invalid_choices):
         log += "\ninvalid configurations: \n"
         for t, s, c in invalid_choices:
             log += "[x] transform:{} option:{} invalid_choice={}\n".format(t, s, c)
+
     raise exceptions.ConfigurationError(log)
 
 
@@ -216,7 +217,7 @@ def build_command(configs: dict, source: str):
     for option, choice in top_level.items():
         cmd += "--{}={} ".format(tigress_format(option), choice)
 
-    # Adds parsed transform configurations into ``cmd```.
+    # Adds parsed transform configurations into ``cmd``.
     for config in transforms.values():
         transform = config.pop("transform_name")
         tf = tigress_format(transform)
