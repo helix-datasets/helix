@@ -74,6 +74,7 @@ setup(
         "helix.components": [
             "configuration-example = helix.components.examples.configuration.configuration:ConfigurationExampleComponent",
             "minimal-example = helix.components.examples.minimal.minimal:MinimalExampleComponent",
+            "fibonacci = helix.components.fibonacci.fibonacci:FibonacciComponent",
             "windows-deletefile-file-deletion = helix.components.attack.defense_evasion.file_deletion.deletefile.deletefile:AttackWindowsDeleteFileFileDeletionComponent [windows]",
             "windows-bitblt-screen-capture = helix.components.attack.collection.screen_capture.bitblt.bitblt:AttackWindowsBitBltScreenCaptureComponent [windows]",
             "windows-regqueryvalue-query-registry = helix.components.attack.discovery.query_registry.regqueryvalue.regqueryvalue:AttackWindowsRegQueryValueQueryRegistryComponent [windows]",
@@ -94,11 +95,15 @@ setup(
             "strip = helix.transforms.strip.strip:StripTransform [linux]",
             "upx = helix.transforms.upx.upx:UPXTransform",
             "mpress = helix.transforms.mpress.mpress:MPRESSTransform [windows]",
+            "tigress = helix.transforms.tigress.tigress:TigressTransform [linux]",
         ],
         "helix.tests": [
             "minimal-example = helix.components.examples.minimal.minimal:MinimalExampleComponentTests [testing]",
+            "fibonacci = helix.components.fibonacci.fibonacci:FibonacciComponentTests [testing]",
             "replace-example = helix.transforms.examples.replace.replace:ReplaceExampleTransformTests [testing]",
             "upx = helix.transforms.upx.tests:UPXTests [testing]",
+            "tigress-utils = helix.transforms.tigress.tests:TigressUtilityTests [testing]",
+            "tigress = helix.transforms.tigress.tests:TigressTests [testing]",
         ],
     },
 )
