@@ -11,7 +11,7 @@ from ... import exceptions, transform, utils
 from . import utils as tigress_utils
 from .configurations import tigress_transforms
 
-logger = logging.getLogger("transform.tigress")
+logger = logging.getLogger(__name__)
 
 
 class TigressError(Exception):
