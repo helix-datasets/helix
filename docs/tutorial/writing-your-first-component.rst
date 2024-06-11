@@ -443,7 +443,7 @@ Add the following to the ``ExampleComponent`` class:
 
             ...
 
-            function = utils.substitute(self.TEMPLATE, message=formatted)
+            function = utils.substitute(self.template, message=formatted)
 
 Reinstall the Python package (if not in editable mode) and install dependencies
 for our Component:
