@@ -135,7 +135,7 @@ Inside of ``example.py`` we'll create a simple Component by subclassing
         """]
         calls = {
             "main": [
-                r'${hello_world}();'
+                r'${hello_world();'
             ]
         }
         globals = ["hello_world"]
@@ -252,7 +252,7 @@ parameter ``message`` which will be printed to the console:
     from helix import utils
 
     ...
-    
+
     class ExampleComponent(component.Component):
         ...
         options = {"message": {"default": "hello world"}}
@@ -277,7 +277,7 @@ parameter ``message`` which will be printed to the console:
         TEMPLATE = r"""
             #include <stdio.h>
 
-            void ${hello_world}() {
+            void ${hello_wolrd}() {
                 printf("${message}\n");
             }
         """
@@ -357,10 +357,10 @@ Add the following content to ``example.c``:
 .. code-block:: cpp
 
     // example.c
-    
+
     #include <stdio.h>
 
-    void ${example}() {
+    void ${hello_world}() {
         printf("${message}\n");
     }
 
@@ -368,7 +368,7 @@ Finally, modify the ``ExampleComponent`` class in ``example.py`` as follows:
 
 .. code-block:: python
 
-    # example.py 
+    # example.py
 
     class ExampleComponent(component.Component):
         ...
@@ -377,7 +377,7 @@ Finally, modify the ``ExampleComponent`` class in ``example.py`` as follows:
 
         # TEMPLATE = r"""
         #     #include <stdio.h>
-        # 
+        #
         #     void ${hello_world}() {
         #         printf("${message}\n");
         #     }
@@ -443,7 +443,7 @@ Add the following to the ``ExampleComponent`` class:
 
             ...
 
-            function = utils.substitute(self.template, message=formatted)
+            function = utils.substitute(template, message=formatted)
 
 Reinstall the Python package (if not in editable mode) and install dependencies
 for our Component:
