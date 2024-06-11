@@ -450,7 +450,7 @@ for our Component:
 
 .. code-block:: bash
 
-    helix dependencies component example-component
+    helix install components example-component
 
 
 .. note:: You may need to run the above command as root/Administrator to
