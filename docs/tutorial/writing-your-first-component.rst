@@ -135,7 +135,7 @@ Inside of ``example.py`` we'll create a simple Component by subclassing
         """]
         calls = {
             "main": [
-                r'${hello_world();'
+                r'${hello_world}();'
             ]
         }
         globals = ["hello_world"]
@@ -190,7 +190,7 @@ entrypoint in the group ``helix.components`` to our Python package's
         ...
         "helix.components": [
             "example-component = helix_example.components.example:ExampleComponent"
-        ]
+        ],
         ...
     }
     ...
@@ -465,7 +465,7 @@ Finally, build the ``cmake-cpp`` Blueprint again with our updated Component:
 You should now get an output similar to the following when running the
 generated artifact binary:
 
-.. code-block:: 
+.. code-block::
 
      _____________
     < hello world >
@@ -504,7 +504,7 @@ following to the ``example.py`` module:
     class ExampleComponentTests(tests.UnitTestCase, tests.ComponentTestCaseMixin):
         blueprint = "cmake-cpp"
         component = "example-component"
-    
+
 This will create a couple of simple unit tests from
 :class:`TestCaseMixin<helix.tests.ComponentTestCaseMixin>`.
 
@@ -524,11 +524,11 @@ group in the Python package's ``setup.py`` as follows:
     ...
     entry_points={
         ...
-        "helix.tests": {
+        "helix.tests": [
             "example-component = helix_example.components.example:ExampleComponentTests"
-        }
+        ],
         ...
-    }
+    },
     ...
 
 Finally, to run unit tests for Blueprints, Components, and Transforms, run:
