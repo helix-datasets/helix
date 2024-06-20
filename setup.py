@@ -28,11 +28,11 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Security",
         "Topic :: Software Development",
         "Topic :: Software Development :: Build Tools",
@@ -52,7 +52,7 @@ setup(
             "sphinx",
             "sphinx_rtd_theme",
         ],
-        "testing": ["xmlrunner", "flake8-formatter-junit-xml"],
+        "testing": ["unittest-xml-reporting", "flake8-formatter-junit-xml"],
         # Platform-specific extras.
         # It's not necessary to specify these extras when installing HELIX.
         # Because of the environment markers here make these dependency lists

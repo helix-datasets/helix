@@ -385,7 +385,7 @@ class WindowsChocolateyDependency(Dependency):
             )
 
         output, _ = run(
-            "{} list -l -e {}".format(choco, self.package),
+            "{} list -e {}".format(choco, self.package),
             ".",
         )
 
