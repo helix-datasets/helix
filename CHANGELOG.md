@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for Component `Loader` interface to CLI commands.
 - `dataset-similarity` CLI command for generating program similarity datasets.
 - Added explicit support for Python 3.11.
+- Added explicit support for Python 3.12.
 
 ### Fixed
 - Correct documentation for `verbose_name` - property not optional.
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Removed explicit support for Python 3.5 (end-of-life).
 - Removed explicit support for Python 3.6 (end-of-life).
+- Removed explicit support for Python 3.7 (end-of-life).
 
 ## [1.2.0] - 2022-01-18
 ### Added

@@ -267,9 +267,11 @@ class Command(mutils.CommandBase):
                             parameters.append(
                                 "{}{}".format(
                                     option,
-                                    " (default: {})".format(settings["default"])
-                                    if "default" in settings
-                                    else "",
+                                    (
+                                        " (default: {})".format(settings["default"])
+                                        if "default" in settings
+                                        else ""
+                                    ),
                                 )
                             )
 
