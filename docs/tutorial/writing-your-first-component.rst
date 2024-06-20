@@ -190,7 +190,7 @@ entrypoint in the group ``helix.components`` to our Python package's
         ...
         "helix.components": [
             "example-component = helix_example.components.example:ExampleComponent"
-        ]
+        ],
         ...
     }
     ...
@@ -252,7 +252,7 @@ parameter ``message`` which will be printed to the console:
     from helix import utils
 
     ...
-    
+
     class ExampleComponent(component.Component):
         ...
         options = {"message": {"default": "hello world"}}
@@ -277,7 +277,7 @@ parameter ``message`` which will be printed to the console:
         TEMPLATE = r"""
             #include <stdio.h>
 
-            void ${hello_world}() {
+            void ${hello_wolrd}() {
                 printf("${message}\n");
             }
         """
@@ -357,10 +357,10 @@ Add the following content to ``example.c``:
 .. code-block:: cpp
 
     // example.c
-    
+
     #include <stdio.h>
 
-    void ${example}() {
+    void ${hello_world}() {
         printf("${message}\n");
     }
 
@@ -368,7 +368,7 @@ Finally, modify the ``ExampleComponent`` class in ``example.py`` as follows:
 
 .. code-block:: python
 
-    # example.py 
+    # example.py
 
     class ExampleComponent(component.Component):
         ...
@@ -377,7 +377,7 @@ Finally, modify the ``ExampleComponent`` class in ``example.py`` as follows:
 
         # TEMPLATE = r"""
         #     #include <stdio.h>
-        # 
+        #
         #     void ${hello_world}() {
         #         printf("${message}\n");
         #     }
@@ -443,14 +443,14 @@ Add the following to the ``ExampleComponent`` class:
 
             ...
 
-            function = utils.substitute(self.TEMPLATE, message=formatted)
+            function = utils.substitute(template, message=formatted)
 
 Reinstall the Python package (if not in editable mode) and install dependencies
 for our Component:
 
 .. code-block:: bash
 
-    helix dependencies component example-component
+    helix install components example-component
 
 
 .. note:: You may need to run the above command as root/Administrator to
@@ -465,7 +465,7 @@ Finally, build the ``cmake-cpp`` Blueprint again with our updated Component:
 You should now get an output similar to the following when running the
 generated artifact binary:
 
-.. code-block:: 
+.. code-block::
 
      _____________
     < hello world >
@@ -504,7 +504,7 @@ following to the ``example.py`` module:
     class ExampleComponentTests(tests.UnitTestCase, tests.ComponentTestCaseMixin):
         blueprint = "cmake-cpp"
         component = "example-component"
-    
+
 This will create a couple of simple unit tests from
 :class:`TestCaseMixin<helix.tests.ComponentTestCaseMixin>`.
 
@@ -524,11 +524,11 @@ group in the Python package's ``setup.py`` as follows:
     ...
     entry_points={
         ...
-        "helix.tests": {
+        "helix.tests": [
             "example-component = helix_example.components.example:ExampleComponentTests"
-        }
+        ],
         ...
-    }
+    },
     ...
 
 Finally, to run unit tests for Blueprints, Components, and Transforms, run:
