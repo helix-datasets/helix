@@ -744,10 +744,12 @@ def find(name, environment=None, guess=None):
     return None
 
 
-def run(cmd, cwd=None, exception=None, propagate=False, stdout=None, stderr=None):
+def run(
+    cmd, cwd=None, exception=None, propagate=False, stdout=None, stderr=None, env=None
+):
     """Run the given command as a subprocess.
 
-    This function caputres ``stdout`` and ``stderr`` by default and returns
+    This function captures ``stdout`` and ``stderr`` by default and returns
     them, and raises the given exception if the process fails.
 
     Args:
@@ -762,6 +764,9 @@ def run(cmd, cwd=None, exception=None, propagate=False, stdout=None, stderr=None
             be written or ``None``.
         stderr (file): An open file-like object or fileno where stderr should
             be written or ``None``.
+        env (dict): Mapping that defines the environment variables for the new
+            process. By default (``None``) the new process inherits the current
+            process' environment variables.
 
     Returns:
         Output to stdout and stderr as binary strings.
@@ -782,6 +787,7 @@ def run(cmd, cwd=None, exception=None, propagate=False, stdout=None, stderr=None
         shell=True,
         stdout=None if propagate else subprocess.PIPE,
         stderr=None if propagate else subprocess.PIPE,
+        env=env,
     )
 
     if stdout and process.stdout:
